@@ -7,7 +7,12 @@ router.use(requireAuth);
 
 router.get('/', async (req, res) => {
   try {
-    // Get all websites with their monitors
+    // Admin goes to admin dashboard
+    if (res.locals.isAdmin) {
+      return res.redirect('/admin');
+    }
+
+    // Regular user: only see assigned projects
     const { rows: websites } = await db.query(
       `SELECT w.*,
         COUNT(m.id) as monitor_count,
@@ -15,21 +20,25 @@ router.get('/', async (req, res) => {
         COUNT(CASE WHEN m.status = 'down' THEN 1 END) as down_count,
         COUNT(CASE WHEN m.status = 'paused' THEN 1 END) as paused_count
        FROM websites w
+       JOIN user_projects up ON up.website_id = w.id AND up.user_id = $1
        LEFT JOIN monitors m ON m.website_id = w.id
-       WHERE w.user_id = $1
        GROUP BY w.id
-       ORDER BY w.created_at DESC`,
+       ORDER BY w.name ASC`,
       [req.session.userId]
     );
 
-    // Get monitors for each website
-    const { rows: monitors } = await db.query(
-      `SELECT m.* FROM monitors m
-       JOIN websites w ON w.id = m.website_id
-       WHERE w.user_id = $1
-       ORDER BY m.created_at DESC`,
-      [req.session.userId]
-    );
+    // Get monitors for assigned websites
+    const websiteIds = websites.map(w => w.id);
+    let monitors = [];
+    if (websiteIds.length > 0) {
+      const { rows } = await db.query(
+        `SELECT m.* FROM monitors m
+         WHERE m.website_id = ANY($1)
+         ORDER BY m.created_at DESC`,
+        [websiteIds]
+      );
+      monitors = rows;
+    }
 
     // Group monitors by website
     const websiteMonitors = {};
@@ -42,13 +51,12 @@ router.get('/', async (req, res) => {
     const totalMonitors = monitors.length;
     const upCount = monitors.filter(m => m.status === 'up').length;
     const downCount = monitors.filter(m => m.status === 'down').length;
-    const pausedCount = monitors.filter(m => m.status === 'paused').length;
 
     res.render('dashboard/index', {
       title: 'Dashboard',
       websites,
       websiteMonitors,
-      stats: { total: totalMonitors, up: upCount, down: downCount, paused: pausedCount }
+      stats: { total: totalMonitors, up: upCount, down: downCount, paused: monitors.filter(m => m.status === 'paused').length }
     });
   } catch (err) {
     console.error('Dashboard error:', err);

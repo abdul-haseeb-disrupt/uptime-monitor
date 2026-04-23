@@ -1,0 +1,77 @@
+<div>
+  <!-- Overview Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+      <div class="text-sm text-gray-500 mb-1">Total Projects</div>
+      <div class="text-3xl font-bold text-gray-800"><%= overall.total_projects || 0 %></div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+      <div class="text-sm text-gray-500 mb-1">Total Pages</div>
+      <div class="text-3xl font-bold text-blue-600"><%= overall.total_monitors || 0 %></div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-sm text-gray-500 mb-1">Up / Down</div>
+          <div class="text-3xl font-bold">
+            <span class="text-green-600"><%= overall.up_count || 0 %></span>
+            <span class="text-gray-300 text-xl">/</span>
+            <span class="text-red-600"><%= overall.down_count || 0 %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+      <div class="text-sm text-gray-500 mb-1">Total Users</div>
+      <div class="text-3xl font-bold text-purple-600"><%= totalUsers %></div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-lg font-semibold text-gray-700">All Projects</h2>
+    <a href="/admin/projects/new" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+      Add Project
+    </a>
+  </div>
+
+  <% if (websites.length === 0) { %>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+      <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+      <h3 class="text-lg font-medium text-gray-600 mb-2">No projects yet</h3>
+      <p class="text-gray-400 mb-4">Create your first project to start monitoring</p>
+      <a href="/admin/projects/new" class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700">Add Project</a>
+    </div>
+  <% } else { %>
+    <!-- Projects Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% websites.forEach(function(website) { %>
+        <a href="/admin/projects/<%= website.id %>" class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow block">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <% if (parseInt(website.down_count) > 0) { %>
+                <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse flex-shrink-0"></span>
+              <% } else if (parseInt(website.monitor_count) === 0) { %>
+                <span class="w-3 h-3 rounded-full bg-gray-300 flex-shrink-0"></span>
+              <% } else { %>
+                <span class="w-3 h-3 rounded-full bg-green-500 flex-shrink-0"></span>
+              <% } %>
+              <h3 class="font-semibold text-gray-800 truncate"><%= website.name %></h3>
+            </div>
+          </div>
+          <% if (website.base_url) { %>
+            <p class="text-xs text-gray-400 mb-3 truncate"><%= website.base_url %></p>
+          <% } %>
+          <div class="flex items-center gap-3 text-sm">
+            <span class="text-gray-500"><%= website.monitor_count %> pages</span>
+            <span class="text-green-600"><%= website.up_count %> up</span>
+            <% if (parseInt(website.down_count) > 0) { %>
+              <span class="text-red-600"><%= website.down_count %> down</span>
+            <% } %>
+          </div>
+        </a>
+      <% }); %>
+    </div>
+  <% } %>
+</div>

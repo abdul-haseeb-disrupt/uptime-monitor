@@ -103,6 +103,7 @@ const apiMonitorRoutes = require('./routes/api/monitors');
 const apiHeartbeatRoutes = require('./routes/api/heartbeat');
 
 app.use('/', authRoutes(authLimiter));
+app.use('/admin', require('./routes/admin'));
 app.use('/dashboard', dashboardRoutes);
 app.use('/websites', websiteRoutes);
 app.use('/monitors', monitorRoutes);

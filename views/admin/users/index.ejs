@@ -1,0 +1,50 @@
+<div>
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-lg font-semibold text-gray-700">User Management</h2>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="bg-gray-50 border-b text-left">
+          <th class="px-6 py-3 font-medium text-gray-500">Name</th>
+          <th class="px-6 py-3 font-medium text-gray-500">Email</th>
+          <th class="px-6 py-3 font-medium text-gray-500">Role</th>
+          <th class="px-6 py-3 font-medium text-gray-500">Assigned Projects</th>
+          <th class="px-6 py-3 font-medium text-gray-500">Joined</th>
+          <th class="px-6 py-3 font-medium text-gray-500">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(function(u) { %>
+          <tr class="border-b border-gray-50 hover:bg-gray-50">
+            <td class="px-6 py-3 font-medium text-gray-800"><%= u.name %></td>
+            <td class="px-6 py-3 text-gray-500"><%= u.email %></td>
+            <td class="px-6 py-3">
+              <span class="px-2 py-0.5 rounded text-xs font-medium <%= u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600' %>">
+                <%= u.role.toUpperCase() %>
+              </span>
+            </td>
+            <td class="px-6 py-3 text-gray-500"><%= u.assigned_projects %> projects</td>
+            <td class="px-6 py-3 text-gray-400"><%= timeAgo(u.created_at) %></td>
+            <td class="px-6 py-3">
+              <div class="flex items-center gap-2">
+                <a href="/admin/users/<%= u.id %>" class="text-blue-600 hover:underline text-xs">Manage</a>
+                <% if (u.id !== user.id) { %>
+                  <form action="/admin/users/<%= u.id %>/toggle-role" method="POST" class="inline">
+                    <button type="submit" class="text-xs text-purple-600 hover:underline"><%= u.role === 'admin' ? 'Demote' : 'Make Admin' %></button>
+                  </form>
+                  <form action="/admin/users/<%= u.id %>/delete" method="POST" onsubmit="return confirm('Delete this user?')" class="inline">
+                    <button type="submit" class="text-xs text-red-600 hover:underline">Delete</button>
+                  </form>
+                <% } else { %>
+                  <span class="text-xs text-gray-400">(you)</span>
+                <% } %>
+              </div>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
