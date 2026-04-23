@@ -61,12 +61,17 @@ module.exports = function (authLimiter) {
       }
 
       const password_hash = await hashPassword(password);
+
+      // First user becomes admin automatically
+      const { rows: adminCheck } = await db.query("SELECT id FROM users WHERE role = 'admin' LIMIT 1");
+      const role = adminCheck.length === 0 ? 'admin' : 'user';
+
       await db.query(
-        'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3)',
-        [name.trim(), email.toLowerCase().trim(), password_hash]
+        'INSERT INTO users (name, email, password_hash, role) VALUES ($1, $2, $3, $4)',
+        [name.trim(), email.toLowerCase().trim(), password_hash, role]
       );
 
-      req.flash('success', 'Account created! Please login.');
+      req.flash('success', role === 'admin' ? 'Admin account created! Please login.' : 'Account created! Please login.');
       res.redirect('/login');
     } catch (err) {
       console.error('Register error:', err);
@@ -77,6 +82,24 @@ module.exports = function (authLimiter) {
 
   router.post('/logout', (req, res) => {
     req.session.destroy(() => res.redirect('/login'));
+  });
+
+  // One-time setup: make first user admin if no admin exists
+  router.get('/setup-admin', async (req, res) => {
+    try {
+      const { rows: adminCheck } = await db.query("SELECT id FROM users WHERE role = 'admin' LIMIT 1");
+      if (adminCheck.length > 0) {
+        req.flash('info', 'Admin already exists');
+        return res.redirect('/login');
+      }
+      await db.query("UPDATE users SET role = 'admin' WHERE id = (SELECT MIN(id) FROM users)");
+      req.flash('success', 'First user promoted to admin!');
+      res.redirect('/login');
+    } catch (err) {
+      console.error('Setup admin error:', err);
+      req.flash('error', 'Setup failed');
+      res.redirect('/login');
+    }
   });
 
   // Root redirect
