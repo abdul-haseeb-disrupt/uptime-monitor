@@ -1,0 +1,211 @@
+https://uptimerobot.com/
+
+Meet the #1
+uptime monitoring service.
+50 monitors for free
+20+ integrations
+Real-time alerts, web & mobile
+Public status pages
+Start monitoring in 30 seconds
+UptimeRobot
+hewlett-logo
+ibm-logo
+ingr-logo
+intel-logo
+moodys-logo
+rmit-logo
+squareup-logo
+accenture-logo
+gitlab-logo
+Catch downtime before your users do.
+Monitor uptime, SSL certificates, ports, and cron jobs in real time. Set up monitors in minutes, get instant alerts when something breaks, and integrate with your existing workflow effortlessly.
+
+Website monitoring
+Monitor any HTTP(s) endpoint or page
+
+Keyword monitoring
+Get alerted if a keyword appears or disappears
+
+Ping monitoring
+Make sure your server or any device in the network is always available.
+
+Port monitoring
+Useful for SMTP, POP3, FTP, and other services running on specific TCP ports
+
+Cron job monitoring
+Know if a scheduled job fails or goes missing
+
+DNS record monitoring
+Catch unauthorised DNS changes early
+
+Start monitoring in 30 seconds
+Trusted by over 3.2M+ developers and teams.
+4.7
+stars out of 5
+265+
+reviews on
+WordPress VIP
+"Thanks to monitoring thousands of domains, WordPress VIP improved response times and performance while also saving on infrastructure costs."
+Doyle Irvin
+Doyle Irvin
+Product Marketing Manager
+Read case study
+ConfigCat VIP
+"ConfigCat significantly enhanced the user experience and trust by making UptimeRobot and live alerts an essential part of their uptime monitoring."
+Gergely Sinka
+Gergely Sinka
+Founder & CPO at ConfigCat
+Read case study
+Stratosphere Lab
+"UptimeRobot is now part of our core tools for monitoring. The integration with Slack and the Mobile application allows us to have information on what is happening and resolve incidents as fast as possible."
+Veronika Valeros
+Veronika Valeros
+Senior Researcher & Project Leader
+Read case study
+Heineken
+"For critical services , uptime is crucial. UptimeRobot notifies us instantly when there’s downtime or degraded performance, allowing us to respond efficiently."
+David Bezgovšek
+David Bezgovšek
+IT Service Delivery Manager
+Read case study
+Previous
+Next
+Real-time status pages for your website, API, or service.
+Create branded, real-time status pages to share uptime, incidents, and maintenance updates — no extra tools required. Keep your users informed and automatically reduce support tickets.
+
+Custom domains & branding
+Incident history
+Embed monitors automatically
+Password protection & private pages
+Learn moreabout status pages
+Check our live demo
+Keep Your Users Informed
+Setup in under 2 minutes
+Start monitoring in seconds.
+Seriously.
+Start monitoring any website, API, or server in seconds. Our intuitive dashboard, powerful API, and detailed documentation make setup effortless.
+
+Easy-to-use dashboard
+One-click status page setup
+Detailed reports & downtime insights
+Intuitive mobile app
+Start monitoring in 30 seconds
+Deep insights. Full control. Zero blind spots.
+Multi-location checks
+Verify uptime from multiple global locations to eliminate false positives.
+
+Learn moreabout multi-location checks
+Response time alerts
+Incident management tools
+Role-based team access
+Maintenance windows
+Go beyond simple uptime checks with advanced monitoring, incident management and access built for scaling teams.
+
+Multi Location Checks
+Get Alerts
+Integrations that keep your whole team in the loop.
+From chat to incident management, we integrate with 20+ services so your team never misses a critical update.
+
+Stay Notified
+Monitor on the go. Stay in control anywhere.
+Get real-time alerts and manage all your monitors from anywhere. Check statuses, pause monitors, and resolve incidents instantly
+
+Need more than 1,000 monitors? Get an enterprise demo.
+30-second check intervals
+Unlimited status pages
+SOC 2, CCPA, GDPR compliant
+Dedicated success manager
+Book a demo
+Register Free
+Frequently asked questions.
+
+What is UptimeRobot?
+UptimeRobot is an uptime monitoring service that continuously checks websites, APIs, and other endpoints. It alerts you when anything goes down, degrades, or changes. So you can stay on top of your systems' current states and identify issues before your users do.
+
+UptimeRobot also provides tools to transparently communicate the real-time status and reliability of your systems, and proactively manage incidents when they happen.
+
+
+What is an uptime monitor?
+
+
+
+
+How do I monitor the uptime of a website?
+
+How do I create a status page?
+
+What can I monitor with UptimeRobot?
+
+
+
+How often does UptimeRobot check my website?
+
+
+
+Can I monitor from multiple locations/regions?
+
+
+How do I get an alert when a website is down (by email, SMS/IM, or phone)?
+
+
+How does UptimeRobot reduce false alarms (false positives)?
+
+CTA Banner
+4.7
+stars out of 5
+265+
+reviews on
+Start monitoring in 30 seconds.
+There's nothing to install. No credit card required. 50 monitors for free.
+
+Get started free
+Downtime happens.
+Get notified!
+
+Monitoring.
+Website & endpoint monitoring
+Keyword monitoring
+Ping monitoring
+Port monitoring
+Cron job monitoring
+Status pages
+Incident management
+API monitoring
+Product.
+Integrations
+API
+MCP
+Roadmap
+Status
+Is it down?
+Company.
+Contact us
+Affiliate program
+Clients
+Non profits
+Terms / Privacy / DPA
+Security & compliance
+Features.
+Multi-location monitoring
+Response time monitoring
+SSL monitoring
+Domain monitoring
+DNS monitoring
+Comparison.
+vs. Statuspage
+vs. BetterStack
+vs. Site24×7
+vs. Pingdom
+vs. Uptime.com
+Resources.
+Help center
+FAQs
+Locations & IPs
+Blog
+Knowledge hub
+Free tools.
+Subnet calculator
+MX lookup
+Uptime calculator
+CrontabRobot
+Web change detection

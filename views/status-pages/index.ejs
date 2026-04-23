@@ -1,0 +1,38 @@
+<div>
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-lg font-semibold text-gray-700">Your Status Pages</h2>
+    <a href="/status-pages/new" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+      New Status Page
+    </a>
+  </div>
+
+  <% if (statusPages.length === 0) { %>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+      <h3 class="text-lg font-medium text-gray-600 mb-2">No status pages yet</h3>
+      <p class="text-gray-400 mb-4">Create a public status page to share your system's uptime</p>
+      <a href="/status-pages/new" class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700">Create Status Page</a>
+    </div>
+  <% } else { %>
+    <div class="space-y-3">
+      <% statusPages.forEach(function(page) { %>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold text-gray-800"><%= page.title %></h3>
+            <p class="text-sm text-gray-400">
+              <a href="/status/<%= page.slug %>" target="_blank" class="text-blue-600 hover:underline">/status/<%= page.slug %></a>
+              <% if (page.description) { %> &middot; <%= page.description %><% } %>
+            </p>
+          </div>
+          <div class="flex gap-2">
+            <a href="/status/<%= page.slug %>" target="_blank" class="px-3 py-1.5 rounded-lg text-sm font-medium text-blue-600 border border-blue-200 hover:bg-blue-50">View</a>
+            <a href="/status-pages/<%= page.id %>/edit" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50">Edit</a>
+            <form action="/status-pages/<%= page.id %>/delete" method="POST" onsubmit="return confirm('Delete this status page?')" class="inline">
+              <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50">Delete</button>
+            </form>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+</div>

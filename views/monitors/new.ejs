@@ -1,0 +1,107 @@
+<div class="max-w-2xl" x-data="{ type: 'http' }">
+  <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+    <a href="/dashboard" class="hover:text-blue-600">Dashboard</a>
+    <span>/</span>
+    <a href="/websites/<%= website.id %>" class="hover:text-blue-600"><%= website.name %></a>
+    <span>/</span>
+    <span>New Monitor</span>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Add Monitor to "<%= website.name %>"</h2>
+    <form action="/monitors" method="POST" class="space-y-4">
+      <input type="hidden" name="website_id" value="<%= website.id %>">
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Monitor Name *</label>
+        <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="Homepage, API Health, etc.">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Monitor Type *</label>
+        <select name="type" x-model="type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          <option value="http">HTTP(s)</option>
+          <option value="keyword">Keyword</option>
+          <option value="ping">Ping</option>
+          <option value="port">Port</option>
+          <option value="heartbeat">Heartbeat (Cron Job)</option>
+        </select>
+      </div>
+
+      <!-- HTTP / Keyword fields -->
+      <div x-show="type === 'http' || type === 'keyword'">
+        <label class="block text-sm font-medium text-gray-700 mb-1">URL *</label>
+        <input type="url" name="url" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="<%= website.base_url || 'https://example.com' %>" value="<%= website.base_url || '' %>">
+      </div>
+
+      <!-- Keyword fields -->
+      <div x-show="type === 'keyword'" class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Keyword *</label>
+          <input type="text" name="keyword" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="e.g. Welcome">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Keyword Should</label>
+          <select name="keyword_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            <option value="exists">Exist (alert if missing)</option>
+            <option value="not_exists">Not Exist (alert if found)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Ping fields -->
+      <div x-show="type === 'ping'">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Hostname *</label>
+        <input type="text" name="hostname" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="example.com">
+      </div>
+
+      <!-- Port fields -->
+      <div x-show="type === 'port'" class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Hostname *</label>
+          <input type="text" name="hostname" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="example.com">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Port *</label>
+          <input type="number" name="port" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="443">
+        </div>
+      </div>
+
+      <!-- Heartbeat fields -->
+      <div x-show="type === 'heartbeat'">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Expected Interval (seconds) *</label>
+        <input type="number" name="heartbeat_interval" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="3600" value="3600">
+        <p class="text-xs text-gray-400 mt-1">How often your cron job should check in. You'll get a unique URL to ping.</p>
+      </div>
+
+      <!-- Common settings -->
+      <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Check Interval</label>
+          <select name="interval_seconds" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            <option value="60">Every 1 minute</option>
+            <option value="120">Every 2 minutes</option>
+            <option value="300" selected>Every 5 minutes</option>
+            <option value="600">Every 10 minutes</option>
+            <option value="900">Every 15 minutes</option>
+            <option value="1800">Every 30 minutes</option>
+            <option value="3600">Every 1 hour</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Timeout</label>
+          <select name="timeout_seconds" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            <option value="10">10 seconds</option>
+            <option value="30" selected>30 seconds</option>
+            <option value="60">60 seconds</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700">Create Monitor</button>
+        <a href="/websites/<%= website.id %>" class="px-6 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-100">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

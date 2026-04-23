@@ -1,0 +1,223 @@
+<div>
+  <!-- Breadcrumb -->
+  <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+    <a href="/dashboard" class="hover:text-blue-600">Dashboard</a>
+    <span>/</span>
+    <a href="/websites/<%= monitor.website_id %>" class="hover:text-blue-600"><%= monitor.website_name %></a>
+    <span>/</span>
+    <span><%= monitor.name %></span>
+  </div>
+
+  <!-- Monitor header -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-3">
+        <% if (monitor.status === 'up') { %>
+          <span class="w-4 h-4 rounded-full bg-green-500"></span>
+        <% } else if (monitor.status === 'down') { %>
+          <span class="w-4 h-4 rounded-full bg-red-500 animate-pulse"></span>
+        <% } else if (monitor.status === 'paused') { %>
+          <span class="w-4 h-4 rounded-full bg-gray-300"></span>
+        <% } else { %>
+          <span class="w-4 h-4 rounded-full bg-yellow-400"></span>
+        <% } %>
+        <div>
+          <h2 class="text-xl font-bold text-gray-800"><%= monitor.name %></h2>
+          <p class="text-sm text-gray-400">
+            <%= monitor.type.toUpperCase() %>
+            <% if (monitor.url) { %> &middot; <%= monitor.url %><% } %>
+            <% if (monitor.hostname) { %> &middot; <%= monitor.hostname %><% if (monitor.port) { %>:<%= monitor.port %><% } %><% } %>
+            &middot; Every <%= Math.round(monitor.interval_seconds / 60) %> min
+          </p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <form action="/monitors/<%= monitor.id %>/toggle" method="POST" class="inline">
+          <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium border <%= monitor.is_active ? 'text-yellow-600 border-yellow-200 hover:bg-yellow-50' : 'text-green-600 border-green-200 hover:bg-green-50' %>">
+            <%= monitor.is_active ? 'Pause' : 'Resume' %>
+          </button>
+        </form>
+        <a href="/monitors/<%= monitor.id %>/edit" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50">Edit</a>
+        <form action="/monitors/<%= monitor.id %>/delete" method="POST" onsubmit="return confirm('Delete this monitor?')" class="inline">
+          <button type="submit" class="px-3 py-1.5 rounded-lg text-sm font-medium text-red-600 border border-red-200 hover:bg-red-50">Delete</button>
+        </form>
+      </div>
+    </div>
+
+    <% if (monitor.type === 'heartbeat' && monitor.heartbeat_token) { %>
+      <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p class="text-sm font-medium text-blue-700 mb-1">Heartbeat URL (ping this from your cron job):</p>
+        <code class="text-sm text-blue-600 break-all"><%= appUrl %>/api/heartbeat/<%= monitor.heartbeat_token %></code>
+      </div>
+    <% } %>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="p-3 bg-gray-50 rounded-lg">
+        <div class="text-xs text-gray-500">Uptime (24h)</div>
+        <div class="text-lg font-bold <%= stats.uptime_24h >= 99 ? 'text-green-600' : stats.uptime_24h >= 95 ? 'text-yellow-600' : 'text-red-600' %>"><%= stats.uptime_24h ? stats.uptime_24h + '%' : 'N/A' %></div>
+      </div>
+      <div class="p-3 bg-gray-50 rounded-lg">
+        <div class="text-xs text-gray-500">Uptime (7d)</div>
+        <div class="text-lg font-bold <%= stats.uptime_7d >= 99 ? 'text-green-600' : stats.uptime_7d >= 95 ? 'text-yellow-600' : 'text-red-600' %>"><%= stats.uptime_7d ? stats.uptime_7d + '%' : 'N/A' %></div>
+      </div>
+      <div class="p-3 bg-gray-50 rounded-lg">
+        <div class="text-xs text-gray-500">Uptime (30d)</div>
+        <div class="text-lg font-bold <%= stats.uptime_30d >= 99 ? 'text-green-600' : stats.uptime_30d >= 95 ? 'text-yellow-600' : 'text-red-600' %>"><%= stats.uptime_30d ? stats.uptime_30d + '%' : 'N/A' %></div>
+      </div>
+      <div class="p-3 bg-gray-50 rounded-lg">
+        <div class="text-xs text-gray-500">Avg Response (24h)</div>
+        <div class="text-lg font-bold text-gray-700"><%= stats.avg_response_24h ? stats.avg_response_24h + 'ms' : 'N/A' %></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 90-day uptime bar -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-semibold text-gray-700">90-Day Uptime</h3>
+      <div class="flex items-center gap-3 text-xs text-gray-400">
+        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-green-500"></span> 100%</span>
+        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-yellow-400"></span> 95-99%</span>
+        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-red-500"></span> &lt;95%</span>
+        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-gray-200"></span> No data</span>
+      </div>
+    </div>
+    <%- include('../partials/uptime-bar', { dailyUptime: dailyUptime }) %>
+    <div class="flex justify-between text-xs text-gray-400 mt-1">
+      <span>90 days ago</span>
+      <span>Today</span>
+    </div>
+  </div>
+
+  <!-- Response time chart -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-semibold text-gray-700">Response Time</h3>
+      <div class="flex gap-1" x-data="{ range: '24h' }">
+        <% ['24h', '7d', '30d'].forEach(function(r) { %>
+          <button @click="range = '<%= r %>'; loadChart('<%= r %>')"
+            :class="range === '<%= r %>' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:bg-gray-100'"
+            class="px-2 py-1 rounded text-xs font-medium"><%= r %></button>
+        <% }); %>
+      </div>
+    </div>
+    <div style="height: 200px;">
+      <canvas id="responseChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Recent checks -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <h3 class="text-sm font-semibold text-gray-700 mb-4">Recent Checks</h3>
+    <% if (recentChecks.length === 0) { %>
+      <p class="text-gray-400 text-sm">No checks yet</p>
+    <% } else { %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-500 border-b">
+              <th class="pb-2 font-medium">Status</th>
+              <th class="pb-2 font-medium">Response Time</th>
+              <th class="pb-2 font-medium">Status Code</th>
+              <th class="pb-2 font-medium">Time</th>
+              <th class="pb-2 font-medium">Error</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% recentChecks.slice(0, 20).forEach(function(check) { %>
+              <tr class="border-b border-gray-50">
+                <td class="py-2">
+                  <span class="inline-flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full <%= check.status === 'up' ? 'bg-green-500' : 'bg-red-500' %>"></span>
+                    <%= check.status.toUpperCase() %>
+                  </span>
+                </td>
+                <td class="py-2"><%= formatResponseTime(check.response_time) %></td>
+                <td class="py-2"><%= check.status_code || '-' %></td>
+                <td class="py-2 text-gray-400"><%= timeAgo(check.checked_at) %></td>
+                <td class="py-2 text-red-500 text-xs"><%= check.error_message || '' %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Incidents -->
+  <% if (incidents.length > 0) { %>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <h3 class="text-sm font-semibold text-gray-700 mb-4">Incidents</h3>
+      <div class="space-y-3">
+        <% incidents.forEach(function(incident) { %>
+          <div class="p-3 rounded-lg border <%= incident.resolved_at ? 'border-gray-200 bg-gray-50' : 'border-red-200 bg-red-50' %>">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium <%= incident.resolved_at ? 'text-gray-600' : 'text-red-700' %>">
+                <%= incident.resolved_at ? 'Resolved' : 'Ongoing' %>
+              </span>
+              <span class="text-xs text-gray-400"><%= timeAgo(incident.started_at) %></span>
+            </div>
+            <% if (incident.cause) { %>
+              <p class="text-xs text-gray-500 mt-1"><%= incident.cause %></p>
+            <% } %>
+            <% if (incident.resolved_at) { %>
+              <p class="text-xs text-gray-400 mt-1">Duration: <%= formatDuration(new Date(incident.resolved_at) - new Date(incident.started_at)) %></p>
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<script>
+let chartInstance = null;
+
+async function loadChart(range) {
+  try {
+    const res = await fetch('/api/monitors/<%= monitor.id %>/checks?range=' + range);
+    const data = await res.json();
+
+    const labels = data.map(d => {
+      const date = new Date(d.checked_at);
+      return range === '24h' ? date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : date.toLocaleDateString([], {month:'short', day:'numeric'});
+    });
+    const values = data.map(d => d.response_time);
+
+    if (chartInstance) chartInstance.destroy();
+
+    const ctx = document.getElementById('responseChart').getContext('2d');
+    chartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Response Time (ms)',
+          data: values,
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          pointHitRadius: 10
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { display: true, grid: { display: false }, ticks: { maxTicksLimit: 10, font: { size: 10 } } },
+          y: { display: true, beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { font: { size: 10 }, callback: v => v + 'ms' } }
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Chart load error:', err);
+  }
+}
+
+// Load initial chart
+document.addEventListener('DOMContentLoaded', () => loadChart('24h'));
+</script>

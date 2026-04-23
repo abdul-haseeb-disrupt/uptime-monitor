@@ -1,0 +1,65 @@
+<div class="max-w-2xl space-y-6">
+  <!-- Profile Settings -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Profile Settings</h2>
+    <form action="/settings" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+        <input type="text" name="name" value="<%= user.name %>" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        <input type="email" value="<%= user.email %>" disabled class="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Timezone</label>
+        <select name="timezone" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+          <% ['UTC', 'Asia/Karachi', 'Asia/Kolkata', 'America/New_York', 'America/Chicago', 'America/Los_Angeles', 'Europe/London', 'Europe/Berlin', 'Asia/Tokyo', 'Asia/Shanghai', 'Australia/Sydney'].forEach(function(tz) { %>
+            <option value="<%= tz %>" <%= user.timezone === tz ? 'selected' : '' %>><%= tz %></option>
+          <% }); %>
+        </select>
+      </div>
+      <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700">Save Settings</button>
+    </form>
+  </div>
+
+  <!-- Slack Webhook -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Slack Alerts</h2>
+    <form action="/settings" method="POST" class="space-y-4">
+      <input type="hidden" name="name" value="<%= user.name %>">
+      <input type="hidden" name="timezone" value="<%= user.timezone %>">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Slack Webhook URL</label>
+        <input type="url" name="slack_webhook_url" value="<%= user.slack_webhook_url || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="https://hooks.slack.com/services/...">
+        <p class="text-xs text-gray-400 mt-1">Get this from your Slack workspace's Incoming Webhooks app</p>
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700">Save Webhook</button>
+        <form action="/settings/test-slack" method="POST" class="inline">
+          <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium text-blue-600 border border-blue-200 hover:bg-blue-50">Test Slack Alert</button>
+        </form>
+      </div>
+    </form>
+  </div>
+
+  <!-- Change Password -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Change Password</h2>
+    <form action="/settings/password" method="POST" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+        <input type="password" name="current_password" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+        <input type="password" name="new_password" required minlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+        <input type="password" name="confirm_password" required minlength="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+      </div>
+      <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700">Change Password</button>
+    </form>
+  </div>
+</div>

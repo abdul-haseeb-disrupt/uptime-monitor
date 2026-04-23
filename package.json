@@ -1,0 +1,33 @@
+{
+  "name": "uptime-monitor",
+  "version": "1.0.0",
+  "description": "Self-hosted uptime monitoring tool",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "css:build": "tailwindcss -i ./public/css/input.css -o ./public/css/app.css --minify",
+    "css:watch": "tailwindcss -i ./public/css/input.css -o ./public/css/app.css --watch"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
+    "connect-flash": "^0.1.1",
+    "connect-pg-simple": "^9.0.1",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "express-ejs-layouts": "^2.5.1",
+    "express-rate-limit": "^7.4.1",
+    "express-session": "^1.18.1",
+    "helmet": "^7.2.0",
+    "node-cron": "^3.0.3",
+    "p-limit": "^3.1.0",
+    "pg": "^8.13.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7",
+    "tailwindcss": "^3.4.16"
+  }
+}
