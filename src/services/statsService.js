@@ -25,7 +25,8 @@ async function getMonitorStats(monitorId) {
     const total = parseInt(row.total) || 0;
     const upCount = parseInt(row.up_count) || 0;
 
-    stats[`uptime_${period.label}`] = total > 0 ? ((upCount / total) * 100).toFixed(3) : null;
+    const uptime = total > 0 ? (upCount / total) * 100 : null;
+    stats[`uptime_${period.label}`] = uptime !== null ? (uptime === 100 ? '100' : uptime.toFixed(2)) : null;
     stats[`avg_response_${period.label}`] = row.avg_response_time ? Math.round(parseFloat(row.avg_response_time)) : null;
   }
 
