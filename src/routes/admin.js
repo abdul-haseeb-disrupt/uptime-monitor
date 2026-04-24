@@ -199,7 +199,10 @@ router.get('/projects/:id/pages/new', async (req, res) => {
 // Create page (monitor)
 router.post('/projects/:id/pages', async (req, res) => {
   try {
-    const { name, type, url, hostname, port, keyword, keyword_type, interval_seconds, timeout_seconds, heartbeat_interval } = req.body;
+    const { name, type, url, keyword, keyword_type, interval_seconds, timeout_seconds, heartbeat_interval } = req.body;
+    // hostname and port can come as arrays when multiple fields with same name exist
+    const hostname = Array.isArray(req.body.hostname) ? req.body.hostname.find(h => h) : req.body.hostname;
+    const port = Array.isArray(req.body.port) ? req.body.port.find(p => p) : req.body.port;
     const websiteId = req.params.id;
 
     const { rows: websites } = await db.query('SELECT * FROM websites WHERE id = $1', [websiteId]);
@@ -216,10 +219,10 @@ router.post('/projects/:id/pages', async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
       [
         parseInt(websiteId), name.trim(), type,
-        url ? url.trim() : null,
-        hostname ? hostname.trim() : null,
+        url ? String(url).trim() : null,
+        hostname ? String(hostname).trim() : null,
         port ? parseInt(port) : null,
-        keyword ? keyword.trim() : null,
+        keyword ? String(keyword).trim() : null,
         keyword_type || null,
         type === 'heartbeat' ? generateToken() : null,
         heartbeat_interval ? parseInt(heartbeat_interval) : null,
