@@ -99,7 +99,7 @@
                 <!-- 90-day uptime bar -->
                 <td class="px-2 py-2.5">
                   <% if (monitor.dailyUptime) { %>
-                    <div class="flex gap-[1px] items-end h-3.5 max-w-[200px] mx-auto">
+                    <div class="flex gap-[2px] items-end h-7 min-w-[280px] mx-auto">
                       <% monitor.dailyUptime.forEach(function(day) { %>
                         <%
                           let c = 'bg-slate-200';
@@ -110,7 +110,7 @@
                             else c = 'bg-red-500';
                           }
                         %>
-                        <div class="<%= c %> rounded-[1px] flex-1" style="min-width:1px; height:<%= day.uptime !== null ? Math.max(4, (day.uptime/100)*14) : 2 %>px;" title="<%= day.day %>: <%= day.uptime !== null ? day.uptime.toFixed(1)+'%' : 'No data' %>"></div>
+                        <div class="<%= c %> rounded-[2px] flex-1 hover:opacity-75 transition-opacity" style="min-width:2px; height:<%= day.uptime !== null ? Math.max(8, (day.uptime/100)*28) : 4 %>px;" title="<%= day.day %>: <%= day.uptime !== null ? day.uptime.toFixed(1)+'%' : 'No data' %>"></div>
                       <% }); %>
                     </div>
                   <% } %>
