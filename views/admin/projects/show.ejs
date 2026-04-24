@@ -110,7 +110,7 @@
           <!-- PageSpeed scores (Mobile + Desktop) -->
           <% if (monitor.pagespeed) { %>
             <% ['mobile', 'desktop'].forEach(function(strategy) { %>
-              <% var ps = monitor.pagespeed[strategy]; %>
+              <% var ps = monitor.pagespeed['24h'] ? monitor.pagespeed['24h'][strategy] : null; %>
               <% if (ps) { %>
                 <div class="mb-2">
                   <div class="text-[10px] font-semibold text-slate-400 uppercase mb-1.5 flex items-center gap-1">

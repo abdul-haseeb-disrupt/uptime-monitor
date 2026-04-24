@@ -73,31 +73,42 @@ async function runPageSpeedChecks() {
 }
 
 async function getLatestScores(monitorId) {
+  const periods = [
+    { key: '24h', interval: '24 hours' },
+    { key: '7d', interval: '7 days' },
+    { key: '30d', interval: '30 days' },
+    { key: '90d', interval: '90 days' }
+  ];
+
   const result = {};
 
-  for (const strategy of ['mobile', 'desktop']) {
-    const { rows } = await db.query(
-      `SELECT
-        ROUND(AVG(performance)) as performance,
-        ROUND(AVG(accessibility)) as accessibility,
-        ROUND(AVG(best_practices)) as best_practices,
-        ROUND(AVG(seo)) as seo,
-        ROUND(AVG(lcp)::numeric, 2) as lcp,
-        ROUND(AVG(cls)::numeric, 3) as cls,
-        ROUND(AVG(fcp)) as fcp,
-        ROUND(AVG(ttfb)) as ttfb,
-        MAX(checked_at) as checked_at,
-        COUNT(*) as check_count
-       FROM pagespeed_checks
-       WHERE monitor_id = $1 AND strategy = $2 AND checked_at > NOW() - INTERVAL '24 hours'`,
-      [monitorId, strategy]
-    );
-    if (rows[0] && rows[0].performance) {
-      result[strategy] = rows[0];
+  for (const period of periods) {
+    result[period.key] = {};
+    for (const strategy of ['mobile', 'desktop']) {
+      const { rows } = await db.query(
+        `SELECT
+          ROUND(AVG(performance)) as performance,
+          ROUND(AVG(accessibility)) as accessibility,
+          ROUND(AVG(best_practices)) as best_practices,
+          ROUND(AVG(seo)) as seo,
+          ROUND(AVG(lcp)::numeric, 2) as lcp,
+          ROUND(AVG(cls)::numeric, 3) as cls,
+          ROUND(AVG(fcp)) as fcp,
+          ROUND(AVG(ttfb)) as ttfb,
+          COUNT(*) as check_count
+         FROM pagespeed_checks
+         WHERE monitor_id = $1 AND strategy = $2 AND checked_at > NOW() - INTERVAL '${period.interval}'`,
+        [monitorId, strategy]
+      );
+      if (rows[0] && rows[0].performance) {
+        result[period.key][strategy] = rows[0];
+      }
     }
   }
 
-  return (result.mobile || result.desktop) ? result : null;
+  // Check if any data exists
+  const hasData = periods.some(p => result[p.key].mobile || result[p.key].desktop);
+  return hasData ? result : null;
 }
 
 async function getScoreHistory(monitorId, days) {
