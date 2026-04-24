@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto py-8 px-4 fade-in">
+<div class="max-w-6xl mx-auto py-8 px-4 fade-in">
   <!-- Header -->
   <div class="text-center mb-6">
     <h1 class="text-2xl font-bold text-slate-800"><%= statusPage.title %></h1>
@@ -22,92 +22,151 @@
     <span class="text-xs font-normal ml-2 opacity-70">Updated every 60s</span>
   </div>
 
-  <!-- Monitors - Compact Table -->
+  <!-- Monitors Table -->
   <% if (monitors.length > 0) { %>
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6">
-      <!-- Table header -->
-      <div class="grid grid-cols-12 gap-2 px-4 py-2.5 bg-slate-50 border-b border-slate-200 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-        <div class="col-span-3">Service</div>
-        <div class="col-span-4 text-center">90-Day Uptime</div>
-        <div class="col-span-1 text-center">Uptime</div>
-        <div class="col-span-2 text-center">Speed</div>
-        <div class="col-span-2 text-right">Status</div>
-      </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6 overflow-x-auto">
+      <table class="w-full min-w-[900px]">
+        <thead>
+          <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+            <th class="text-left px-4 py-2.5 w-[200px]">Service</th>
+            <th class="text-center px-2 py-2.5">90-Day Uptime</th>
+            <th class="text-center px-2 py-2.5 w-[60px]">Uptime</th>
+            <th class="text-center px-2 py-2.5 w-[45px]">Perf</th>
+            <th class="text-center px-2 py-2.5 w-[45px]">A11y</th>
+            <th class="text-center px-2 py-2.5 w-[45px]">BP</th>
+            <th class="text-center px-2 py-2.5 w-[45px]">SEO</th>
+            <th class="text-center px-2 py-2.5 w-[55px]">LCP</th>
+            <th class="text-center px-2 py-2.5 w-[45px]">CLS</th>
+            <th class="text-right px-4 py-2.5 w-[90px]">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% monitors.forEach(function(monitor, index) { %>
+            <tr class="<%= index < monitors.length - 1 ? 'border-b border-slate-100' : '' %> hover:bg-slate-50/50 transition-colors">
+              <!-- Name + URL -->
+              <td class="px-4 py-2">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="w-2 h-2 rounded-full flex-shrink-0
+                    <%= monitor.status === 'up' ? 'bg-emerald-500' : monitor.status === 'down' ? 'bg-red-500 status-pulse' : 'bg-slate-300' %>"></span>
+                  <div class="min-w-0">
+                    <div class="text-sm font-medium text-slate-700 truncate"><%= monitor.display_name || monitor.name %></div>
+                    <% if (monitor.url) { %>
+                      <div class="text-[10px] text-slate-400 truncate"><%= monitor.url.replace(/^https?:\/\//, '') %></div>
+                    <% } %>
+                  </div>
+                </div>
+              </td>
 
-      <!-- Monitor rows -->
-      <% monitors.forEach(function(monitor, index) { %>
-        <div class="grid grid-cols-12 gap-2 px-4 py-2.5 items-center <%= index < monitors.length - 1 ? 'border-b border-slate-100' : '' %> hover:bg-slate-50/50 transition-colors">
-          <!-- Name + URL -->
-          <div class="col-span-3 flex items-center gap-2 min-w-0">
-            <span class="w-2 h-2 rounded-full flex-shrink-0
-              <%= monitor.status === 'up' ? 'bg-emerald-500' : monitor.status === 'down' ? 'bg-red-500 status-pulse' : 'bg-slate-300' %>"></span>
-            <div class="min-w-0">
-              <div class="text-sm font-medium text-slate-700 truncate"><%= monitor.display_name || monitor.name %></div>
-              <% if (monitor.url) { %>
-                <div class="text-[10px] text-slate-400 truncate"><%= monitor.url.replace(/^https?:\/\//, '') %></div>
-              <% } %>
-            </div>
-          </div>
+              <!-- Uptime bar -->
+              <td class="px-2 py-2">
+                <% if (monitor.dailyUptime) { %>
+                  <div class="flex gap-[1px] items-end h-3.5">
+                    <% monitor.dailyUptime.forEach(function(day) { %>
+                      <%
+                        let c = 'bg-slate-200';
+                        if (day.uptime !== null) {
+                          if (day.uptime >= 99.9) c = 'bg-emerald-500';
+                          else if (day.uptime >= 99) c = 'bg-emerald-400';
+                          else if (day.uptime >= 95) c = 'bg-amber-400';
+                          else c = 'bg-red-500';
+                        }
+                      %>
+                      <div class="<%= c %> rounded-[1px] flex-1" style="min-width:1px; height:<%= day.uptime !== null ? Math.max(5, (day.uptime/100)*14) : 3 %>px;" title="<%= day.day %>: <%= day.uptime !== null ? day.uptime.toFixed(1)+'%' : 'No data' %>"></div>
+                    <% }); %>
+                  </div>
+                <% } %>
+              </td>
 
-          <!-- Uptime bar -->
-          <div class="col-span-4 px-1">
-            <% if (monitor.dailyUptime) { %>
-              <div class="flex gap-[1px] items-end h-4">
-                <% monitor.dailyUptime.forEach(function(day) { %>
-                  <%
-                    let c = 'bg-slate-200';
-                    if (day.uptime !== null) {
-                      if (day.uptime >= 99.9) c = 'bg-emerald-500';
-                      else if (day.uptime >= 99) c = 'bg-emerald-400';
-                      else if (day.uptime >= 95) c = 'bg-amber-400';
-                      else c = 'bg-red-500';
-                    }
-                  %>
-                  <div class="<%= c %> rounded-[1px] flex-1" style="min-width:1px; height:<%= day.uptime !== null ? Math.max(6, (day.uptime/100)*16) : 3 %>px;" title="<%= day.day %>: <%= day.uptime !== null ? day.uptime.toFixed(1)+'%' : 'No data' %>"></div>
-                <% }); %>
-              </div>
-            <% } %>
-          </div>
+              <!-- Uptime % -->
+              <td class="px-2 py-2 text-center">
+                <% var up30 = monitor.stats ? monitor.stats.uptime_30d : null; %>
+                <span class="text-xs font-bold <%= up30 && up30 >= 99 ? 'text-emerald-600' : up30 && up30 < 99 ? 'text-red-600' : 'text-slate-400' %>"><%= up30 ? up30 + '%' : '-' %></span>
+              </td>
 
-          <!-- Uptime % -->
-          <div class="col-span-1 text-center">
-            <% var up30 = monitor.stats ? monitor.stats.uptime_30d : null; %>
-            <span class="text-xs font-bold <%= up30 && up30 >= 99 ? 'text-emerald-600' : up30 && up30 < 99 ? 'text-red-600' : 'text-slate-400' %>"><%= up30 ? up30 + '%' : '-' %></span>
-          </div>
+              <%
+                var ps = monitor.pagespeed;
+                function scoreColor(val) {
+                  if (!val && val !== 0) return 'text-slate-300';
+                  if (val >= 90) return 'text-emerald-600';
+                  if (val >= 50) return 'text-amber-600';
+                  return 'text-red-600';
+                }
+                function scoreBg(val) {
+                  if (!val && val !== 0) return '';
+                  if (val >= 90) return 'bg-emerald-50';
+                  if (val >= 50) return 'bg-amber-50';
+                  return 'bg-red-50';
+                }
+              %>
 
-          <!-- PageSpeed -->
-          <div class="col-span-2 text-center">
-            <% if (monitor.pagespeed) { %>
-              <span class="inline-flex items-center gap-1 text-xs font-bold
-                <%= monitor.pagespeed.performance >= 90 ? 'text-emerald-600' : monitor.pagespeed.performance >= 50 ? 'text-amber-600' : 'text-red-600' %>">
-                <span class="w-1.5 h-1.5 rounded-full
-                  <%= monitor.pagespeed.performance >= 90 ? 'bg-emerald-500' : monitor.pagespeed.performance >= 50 ? 'bg-amber-500' : 'bg-red-500' %>"></span>
-                <%= monitor.pagespeed.performance %>
-              </span>
-            <% } else { %>
-              <span class="text-[10px] text-slate-300">-</span>
-            <% } %>
-          </div>
+              <!-- Performance -->
+              <td class="px-2 py-2 text-center">
+                <% if (ps) { %>
+                  <span class="text-xs font-bold <%= scoreColor(ps.performance) %> <%= scoreBg(ps.performance) %> px-1.5 py-0.5 rounded"><%= ps.performance %></span>
+                <% } else { %><span class="text-[10px] text-slate-300">-</span><% } %>
+              </td>
 
-          <!-- Status badge -->
-          <div class="col-span-2 text-right">
-            <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md
-              <%= monitor.status === 'up' ? 'bg-emerald-50 text-emerald-600' :
-                 monitor.status === 'down' ? 'bg-red-50 text-red-600' :
-                 'bg-slate-100 text-slate-500' %>">
-              <%= monitor.status === 'up' ? 'Operational' : monitor.status === 'down' ? 'Down' : 'Unknown' %>
-            </span>
-          </div>
-        </div>
-      <% }); %>
+              <!-- Accessibility -->
+              <td class="px-2 py-2 text-center">
+                <% if (ps) { %>
+                  <span class="text-xs font-bold <%= scoreColor(ps.accessibility) %> <%= scoreBg(ps.accessibility) %> px-1.5 py-0.5 rounded"><%= ps.accessibility %></span>
+                <% } else { %><span class="text-[10px] text-slate-300">-</span><% } %>
+              </td>
+
+              <!-- Best Practices -->
+              <td class="px-2 py-2 text-center">
+                <% if (ps) { %>
+                  <span class="text-xs font-bold <%= scoreColor(ps.best_practices) %> <%= scoreBg(ps.best_practices) %> px-1.5 py-0.5 rounded"><%= ps.best_practices %></span>
+                <% } else { %><span class="text-[10px] text-slate-300">-</span><% } %>
+              </td>
+
+              <!-- SEO -->
+              <td class="px-2 py-2 text-center">
+                <% if (ps) { %>
+                  <span class="text-xs font-bold <%= scoreColor(ps.seo) %> <%= scoreBg(ps.seo) %> px-1.5 py-0.5 rounded"><%= ps.seo %></span>
+                <% } else { %><span class="text-[10px] text-slate-300">-</span><% } %>
+              </td>
+
+              <!-- LCP -->
+              <td class="px-2 py-2 text-center">
+                <% if (ps && ps.lcp) { %>
+                  <span class="text-[11px] font-bold <%= ps.lcp <= 2.5 ? 'text-emerald-600' : ps.lcp <= 4 ? 'text-amber-600' : 'text-red-600' %>"><%= ps.lcp %>s</span>
+                <% } else { %><span class="text-[10px] text-slate-300">-</span><% } %>
+              </td>
+
+              <!-- CLS -->
+              <td class="px-2 py-2 text-center">
+                <% if (ps && ps.cls !== null && ps.cls !== undefined) { %>
+                  <span class="text-[11px] font-bold <%= ps.cls <= 0.1 ? 'text-emerald-600' : ps.cls <= 0.25 ? 'text-amber-600' : 'text-red-600' %>"><%= ps.cls %></span>
+                <% } else { %><span class="text-[10px] text-slate-300">-</span><% } %>
+              </td>
+
+              <!-- Status -->
+              <td class="px-4 py-2 text-right">
+                <span class="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md
+                  <%= monitor.status === 'up' ? 'bg-emerald-50 text-emerald-600' :
+                     monitor.status === 'down' ? 'bg-red-50 text-red-600' :
+                     'bg-slate-100 text-slate-500' %>">
+                  <%= monitor.status === 'up' ? 'Operational' : monitor.status === 'down' ? 'Down' : 'Unknown' %>
+                </span>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
     </div>
 
     <!-- Legend -->
-    <div class="flex items-center justify-center gap-4 text-[10px] text-slate-400 mb-6">
-      <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-emerald-500"></span> 100%</span>
-      <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-amber-400"></span> 95-99%</span>
-      <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-red-500"></span> &lt;95%</span>
-      <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-slate-200"></span> No data</span>
+    <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[10px] text-slate-400 mb-6">
+      <span class="font-semibold text-slate-500">Scores:</span>
+      <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-emerald-500"></span> 90-100 Good</span>
+      <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-amber-400"></span> 50-89 Needs Work</span>
+      <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-sm bg-red-500"></span> 0-49 Poor</span>
+      <span class="mx-1 text-slate-300">|</span>
+      <span class="font-semibold text-slate-500">LCP:</span>
+      <span>&le;2.5s Good</span>
+      <span class="font-semibold text-slate-500">CLS:</span>
+      <span>&le;0.1 Good</span>
     </div>
   <% } %>
 
