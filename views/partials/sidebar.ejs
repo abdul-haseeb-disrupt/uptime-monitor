@@ -24,6 +24,11 @@
         <span x-show="sidebarOpen">Add Project</span>
       </a>
 
+      <a href="/admin/status" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium <%= typeof currentPath !== 'undefined' && currentPath === '/admin/status' ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/25' : 'text-slate-400 hover:text-white hover:bg-white/5' %>">
+        <i data-lucide="activity" class="w-[18px] h-[18px] flex-shrink-0"></i>
+        <span x-show="sidebarOpen">Status Overview</span>
+      </a>
+
       <a href="/admin/users" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium <%= typeof currentPath !== 'undefined' && currentPath.startsWith('/admin/users') ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/25' : 'text-slate-400 hover:text-white hover:bg-white/5' %>">
         <i data-lucide="users" class="w-[18px] h-[18px] flex-shrink-0"></i>
         <span x-show="sidebarOpen">Users</span>
