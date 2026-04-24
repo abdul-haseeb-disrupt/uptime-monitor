@@ -9,16 +9,11 @@ const PSI_API = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 
 async function checkPageSpeed(monitorId, url) {
   try {
-    const params = {
-      url: url,
-      strategy: 'mobile',
-      category: ['performance', 'accessibility', 'best-practices', 'seo']
-    };
-    if (env.PSI_API_KEY) params.key = env.PSI_API_KEY;
+    let apiUrl = `${PSI_API}?url=${encodeURIComponent(url)}&strategy=mobile&category=performance&category=accessibility&category=best-practices&category=seo`;
+    if (env.PSI_API_KEY) apiUrl += `&key=${env.PSI_API_KEY}`;
 
-    const response = await axios.get(PSI_API, {
-      params,
-      timeout: 60000 // PSI can take up to 60s
+    const response = await axios.get(apiUrl, {
+      timeout: 60000
     });
 
     const data = response.data;
