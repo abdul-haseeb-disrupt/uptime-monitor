@@ -111,16 +111,23 @@ function startPageSpeedScheduler() {
     }
   });
 
-  console.log('PageSpeed scheduler started (daily at 4 AM)');
+  console.log('PageSpeed scheduler started (3x daily: 6AM, 2PM, 10PM UTC)');
 
-  // Run first check 2 minutes after startup
+  // Check if any checks exist, if not run immediately after 30s
   setTimeout(async () => {
     try {
-      await runPageSpeedChecks();
+      const { rows } = await db.query('SELECT COUNT(*) as c FROM pagespeed_checks');
+      const count = parseInt(rows[0].c);
+      if (count === 0) {
+        console.log('PageSpeed: No data found, running initial checks...');
+        await runPageSpeedChecks();
+      } else {
+        console.log(`PageSpeed: ${count} existing checks found, waiting for next scheduled run`);
+      }
     } catch (err) {
-      console.error('PageSpeed initial run error:', err.message);
+      console.error('PageSpeed initial check error:', err.message);
     }
-  }, 120000);
+  }, 30000);
 }
 
 module.exports = { startPageSpeedScheduler, getLatestScores, getScoreHistory, runPageSpeedChecks };
