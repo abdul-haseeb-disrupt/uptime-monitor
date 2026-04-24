@@ -25,8 +25,7 @@ router.get('/new', async (req, res) => {
     const { rows: monitors } = await db.query(
       `SELECT m.id, m.name, w.name as website_name FROM monitors m
        JOIN websites w ON w.id = m.website_id
-       WHERE w.user_id = $1 ORDER BY w.name, m.name`,
-      [req.session.userId]
+       ORDER BY w.name, m.name`
     );
     res.render('status-pages/edit', { title: 'New Status Page', statusPage: null, monitors, selectedMonitors: [] });
   } catch (err) {
@@ -89,8 +88,7 @@ router.get('/:id/edit', async (req, res) => {
     const { rows: monitors } = await db.query(
       `SELECT m.id, m.name, w.name as website_name FROM monitors m
        JOIN websites w ON w.id = m.website_id
-       WHERE w.user_id = $1 ORDER BY w.name, m.name`,
-      [req.session.userId]
+       ORDER BY w.name, m.name`
     );
 
     const { rows: selected } = await db.query(
