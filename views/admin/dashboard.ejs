@@ -65,38 +65,41 @@
   <% } else { %>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       <% websites.forEach(function(website) { %>
-        <div onclick="window.location='/admin/projects/<%= website.id %>'" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 card-hover cursor-pointer group">
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl <%= parseInt(website.down_count) > 0 ? 'bg-red-50' : parseInt(website.monitor_count) === 0 ? 'bg-slate-100' : 'bg-green-50' %> flex items-center justify-center flex-shrink-0">
-                <% if (parseInt(website.down_count) > 0) { %>
-                  <i data-lucide="alert-circle" class="w-5 h-5 text-red-500"></i>
-                <% } else if (parseInt(website.monitor_count) === 0) { %>
-                  <i data-lucide="globe" class="w-5 h-5 text-slate-400"></i>
-                <% } else { %>
-                  <i data-lucide="check-circle-2" class="w-5 h-5 text-green-500"></i>
-                <% } %>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 card-hover group relative">
+          <a href="/admin/projects/<%= website.id %>" class="block p-5">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl <%= parseInt(website.down_count) > 0 ? 'bg-red-50' : parseInt(website.monitor_count) === 0 ? 'bg-slate-100' : 'bg-green-50' %> flex items-center justify-center flex-shrink-0">
+                  <% if (parseInt(website.down_count) > 0) { %>
+                    <i data-lucide="alert-circle" class="w-5 h-5 text-red-500"></i>
+                  <% } else if (parseInt(website.monitor_count) === 0) { %>
+                    <i data-lucide="globe" class="w-5 h-5 text-slate-400"></i>
+                  <% } else { %>
+                    <i data-lucide="check-circle-2" class="w-5 h-5 text-green-500"></i>
+                  <% } %>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-slate-800 group-hover:text-primary-600 transition-colors"><%= website.name %></h3>
+                  <% if (website.base_url) { %>
+                    <p class="text-xs text-slate-400 truncate max-w-[180px]"><%= website.base_url %></p>
+                  <% } %>
+                </div>
               </div>
-              <div>
-                <h3 class="font-semibold text-slate-800 group-hover:text-primary-600 transition-colors"><%= website.name %></h3>
-                <% if (website.base_url) { %>
-                  <p class="text-xs text-slate-400 truncate max-w-[180px]"><%= website.base_url %></p>
-                <% } %>
-              </div>
+              <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 group-hover:text-primary-400 transition-colors"></i>
             </div>
-            <a href="/admin/projects/<%= website.id %>/edit" onclick="event.stopPropagation()" class="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-colors opacity-0 group-hover:opacity-100" title="Edit">
-              <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-            </a>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-medium px-2 py-1 rounded-lg bg-slate-100 text-slate-600"><%= website.monitor_count %> pages</span>
-            <% if (parseInt(website.up_count) > 0) { %>
-              <span class="text-xs font-medium px-2 py-1 rounded-lg bg-green-50 text-green-600"><%= website.up_count %> up</span>
-            <% } %>
-            <% if (parseInt(website.down_count) > 0) { %>
-              <span class="text-xs font-medium px-2 py-1 rounded-lg bg-red-50 text-red-600 status-pulse"><%= website.down_count %> down</span>
-            <% } %>
-          </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-medium px-2 py-1 rounded-lg bg-slate-100 text-slate-600"><%= website.monitor_count %> pages</span>
+              <% if (parseInt(website.up_count) > 0) { %>
+                <span class="text-xs font-medium px-2 py-1 rounded-lg bg-green-50 text-green-600"><%= website.up_count %> up</span>
+              <% } %>
+              <% if (parseInt(website.down_count) > 0) { %>
+                <span class="text-xs font-medium px-2 py-1 rounded-lg bg-red-50 text-red-600 status-pulse"><%= website.down_count %> down</span>
+              <% } %>
+            </div>
+          </a>
+          <a href="/admin/projects/<%= website.id %>/edit" class="absolute top-4 right-4 p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-colors opacity-0 group-hover:opacity-100 z-10" title="Edit">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+          </a>
         </div>
       <% }); %>
     </div>
