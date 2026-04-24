@@ -4,6 +4,7 @@ const app = require('./app');
 const { startScheduler } = require('./engine/scheduler');
 const { startRetention } = require('./engine/retention');
 const { startPageSpeedScheduler } = require('./engine/pagespeed');
+const { startSitemapScheduler } = require('./engine/sitemapSync');
 
 async function start() {
   try {
@@ -18,6 +19,9 @@ async function start() {
 
     console.log('Starting PageSpeed scheduler...');
     startPageSpeedScheduler();
+
+    console.log('Starting sitemap sync scheduler...');
+    startSitemapScheduler();
 
     app.listen(env.PORT, () => {
       console.log(`Uptime Monitor running on port ${env.PORT}`);

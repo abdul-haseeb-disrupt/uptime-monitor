@@ -14,6 +14,13 @@
       <% } %>
     </div>
     <div class="flex gap-2">
+      <% if (website.sitemaps && website.sitemaps.length > 0) { %>
+        <form action="/admin/projects/<%= website.id %>/sync-sitemap" method="POST" class="inline">
+          <button type="submit" class="px-3 py-2 rounded-xl text-sm font-medium text-primary-600 border border-primary-200 hover:bg-primary-50 transition-colors flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sync Sitemap
+          </button>
+        </form>
+      <% } %>
       <a href="/admin/projects/<%= website.id %>/pages/new" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-primary-700 hover:to-primary-800 shadow-sm shadow-primary-500/25 flex items-center gap-2 transition-all">
         <i data-lucide="plus" class="w-4 h-4"></i> Add Page
       </a>

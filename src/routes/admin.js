@@ -64,18 +64,29 @@ router.get('/projects/new', (req, res) => {
 // Create project
 router.post('/projects', async (req, res) => {
   try {
-    const { name, base_url } = req.body;
+    const { name, base_url, sitemaps, sitemap_auto_sync } = req.body;
     if (!name) {
       req.flash('error', 'Project name is required');
       return res.redirect('/admin/projects/new');
     }
 
+    // Parse sitemaps (textarea, one per line)
+    const sitemapList = (sitemaps || '').split('\n').map(s => s.trim()).filter(s => s.length > 0);
+
     const { rows } = await db.query(
-      'INSERT INTO websites (user_id, name, base_url) VALUES ($1, $2, $3) RETURNING id',
-      [req.session.userId, name.trim(), (base_url || '').trim()]
+      'INSERT INTO websites (user_id, name, base_url, sitemaps, sitemap_auto_sync) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [req.session.userId, name.trim(), (base_url || '').trim(), sitemapList, sitemap_auto_sync === 'on']
     );
 
-    req.flash('success', 'Project created! Now add pages to monitor.');
+    // If sitemaps provided, sync immediately
+    if (sitemapList.length > 0) {
+      const { syncWebsiteSitemaps } = require('../engine/sitemapSync');
+      const result = await syncWebsiteSitemaps(rows[0].id);
+      req.flash('success', `Project created! ${result.added} pages imported from sitemap.`);
+    } else {
+      req.flash('success', 'Project created! Now add pages to monitor.');
+    }
+
     res.redirect(`/admin/projects/${rows[0].id}`);
   } catch (err) {
     console.error('Create project error:', err);
@@ -152,10 +163,12 @@ router.get('/projects/:id/edit', async (req, res) => {
 // Update project
 router.post('/projects/:id', async (req, res) => {
   try {
-    const { name, base_url } = req.body;
+    const { name, base_url, sitemaps, sitemap_auto_sync } = req.body;
+    const sitemapList = (sitemaps || '').split('\n').map(s => s.trim()).filter(s => s.length > 0);
+
     await db.query(
-      'UPDATE websites SET name = $1, base_url = $2, updated_at = NOW() WHERE id = $3',
-      [name.trim(), (base_url || '').trim(), req.params.id]
+      'UPDATE websites SET name = $1, base_url = $2, sitemaps = $3, sitemap_auto_sync = $4, updated_at = NOW() WHERE id = $5',
+      [name.trim(), (base_url || '').trim(), sitemapList, sitemap_auto_sync === 'on', req.params.id]
     );
     req.flash('success', 'Project updated');
     res.redirect(`/admin/projects/${req.params.id}`);
@@ -421,6 +434,20 @@ router.post('/run-pagespeed', async (req, res) => {
     console.error('Run PageSpeed error:', err);
     req.flash('error', 'Failed to start PageSpeed checks');
     res.redirect('/admin');
+  }
+});
+
+// Sync sitemap for a project
+router.post('/projects/:id/sync-sitemap', async (req, res) => {
+  try {
+    const { syncWebsiteSitemaps } = require('../engine/sitemapSync');
+    const result = await syncWebsiteSitemaps(req.params.id);
+    req.flash('success', `Sitemap synced! ${result.added} new pages added.`);
+    res.redirect(`/admin/projects/${req.params.id}`);
+  } catch (err) {
+    console.error('Sync sitemap error:', err);
+    req.flash('error', 'Failed to sync sitemap');
+    res.redirect(`/admin/projects/${req.params.id}`);
   }
 });
 
