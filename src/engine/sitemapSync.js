@@ -16,23 +16,29 @@ async function parseSitemap(url) {
       allUrls.push(loc);
     }
 
-    // Smart filter: for sections like /blog, /news, /insights, /glossary, /resources
-    // only keep the main section page, skip individual posts
-    const sectionPatterns = /\/(blog|news|insights|glossary|resources|articles|posts|newsroom|case-studies|casestudy|stories|press|tool|tools|category|categories|tag|tags|author|authors|product|products|docs|documentation|help|support|faq|kb|knowledge-base|tutorial|tutorials|guide|guides|template|templates|integration|integrations|changelog|release|releases|event|events|webinar|webinars|podcast|podcasts|video|videos|review|reviews|comparison|comparisons|alternative|alternatives|use-case|use-cases|customer|customers|testimonial|testimonials|gallery|portfolio|work|project|projects)\//i;
-    const sectionRoots = new Set();
+    // Smart filter: for any path with sub-pages, only keep first URL per path
+    // e.g. /blog/a, /blog/b, /blog/c -> only /blog/a gets added
+    const seenPaths = new Set();
     const urls = [];
+    const baseHost = allUrls[0] ? new URL(allUrls[0]).origin : '';
 
     for (const u of allUrls) {
-      const match = u.match(sectionPatterns);
-      if (match) {
-        // This is a sub-page of a section (e.g. /blog/my-post)
-        // Only add the section root once (e.g. /blog)
-        const sectionRoot = u.substring(0, u.indexOf('/' + match[1] + '/') + match[1].length + 2);
-        if (!sectionRoots.has(sectionRoot)) {
-          sectionRoots.add(sectionRoot);
-          urls.push(sectionRoot.replace(/\/$/, ''));
+      try {
+        const path = new URL(u).pathname.replace(/\/$/, '');
+        const segments = path.split('/').filter(Boolean);
+
+        if (segments.length <= 1) {
+          // Top-level page like /blog, /pricing - always add
+          urls.push(u);
+        } else {
+          // Sub-page like /blog/my-post - check if we already have one for this parent
+          const parentPath = '/' + segments[0];
+          if (!seenPaths.has(parentPath)) {
+            seenPaths.add(parentPath);
+            urls.push(u); // Add first sub-page only
+          }
         }
-      } else {
+      } catch (e) {
         urls.push(u);
       }
     }
