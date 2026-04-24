@@ -91,7 +91,9 @@
                 <% } %>
               </div>
             </div>
-            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 group-hover:text-primary-400 transition-colors"></i>
+            <a href="/admin/projects/<%= website.id %>/edit" onclick="event.stopPropagation()" class="p-1.5 rounded-lg border border-slate-200 text-slate-400 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-colors opacity-0 group-hover:opacity-100" title="Edit">
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+            </a>
           </div>
           <div class="flex items-center gap-2">
             <span class="text-xs font-medium px-2 py-1 rounded-lg bg-slate-100 text-slate-600"><%= website.monitor_count %> pages</span>

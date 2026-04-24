@@ -130,8 +130,8 @@ async function syncAllSitemaps() {
 }
 
 function startSitemapScheduler() {
-  // Check sitemaps every 6 hours
-  cron.schedule('0 */6 * * *', async () => {
+  // Check sitemaps every 24 hours (at 5 AM)
+  cron.schedule('0 5 * * *', async () => {
     try {
       await syncAllSitemaps();
     } catch (err) {
@@ -139,7 +139,7 @@ function startSitemapScheduler() {
     }
   });
 
-  console.log('Sitemap sync scheduler started (every 6 hours)');
+  console.log('Sitemap sync scheduler started (daily at 5 AM UTC)');
 }
 
 module.exports = { startSitemapScheduler, syncWebsiteSitemaps, syncAllSitemaps, parseSitemap };
