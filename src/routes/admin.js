@@ -119,7 +119,12 @@ router.get('/projects/:id', async (req, res) => {
       );
       monitor.lastCheck = checks[0] || null;
       monitor.stats = await statsService.getMonitorStats(monitor.id);
-      monitor.dailyUptime = await statsService.getDailyUptime(monitor.id, 90);
+      monitor.uptimeData = {
+        '24h': await statsService.getHourlyUptime(monitor.id),
+        '7': await statsService.getDailyUptime(monitor.id, 7),
+        '30': await statsService.getDailyUptime(monitor.id, 30),
+        '90': await statsService.getDailyUptime(monitor.id, 90)
+      };
       monitor.pagespeed = await getLatestScores(monitor.id);
     }
 
@@ -434,6 +439,65 @@ router.post('/run-pagespeed', async (req, res) => {
     console.error('Run PageSpeed error:', err);
     req.flash('error', 'Failed to start PageSpeed checks');
     res.redirect('/admin');
+  }
+});
+
+// Run PageSpeed for a specific project
+router.post('/projects/:id/run-pagespeed', async (req, res) => {
+  try {
+    const axios = require('axios');
+    const pLimit = require('p-limit');
+    const { getLatestScores } = require('../engine/pagespeed');
+    const env = require('../config/env');
+
+    const { rows: monitors } = await db.query(
+      "SELECT m.id, m.url FROM monitors m WHERE m.website_id = $1 AND m.is_active = true AND m.type IN ('http', 'keyword') AND m.url IS NOT NULL",
+      [req.params.id]
+    );
+
+    req.flash('success', `PageSpeed checks started for ${monitors.length} pages! This will take a few minutes.`);
+    res.redirect(`/admin/projects/${req.params.id}`);
+
+    // Run in background
+    const limit = pLimit(2);
+    const PSI_API = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
+
+    for (const m of monitors) {
+      for (const strategy of ['mobile', 'desktop']) {
+        await limit(async () => {
+          try {
+            let apiUrl = `${PSI_API}?url=${encodeURIComponent(m.url)}&strategy=${strategy}&category=performance&category=accessibility&category=best-practices&category=seo`;
+            if (env.PSI_API_KEY) apiUrl += `&key=${env.PSI_API_KEY}`;
+            const response = await axios.get(apiUrl, { timeout: 90000 });
+            const data = response.data;
+            const cats = data.lighthouseResult?.categories || {};
+            const audits = data.lighthouseResult?.audits || {};
+            await db.query(
+              `INSERT INTO pagespeed_checks (monitor_id, strategy, performance, accessibility, best_practices, seo, lcp, cls, fcp, ttfb, speed_index)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+              [m.id, strategy,
+               Math.round((cats.performance?.score || 0) * 100),
+               Math.round((cats.accessibility?.score || 0) * 100),
+               Math.round((cats['best-practices']?.score || 0) * 100),
+               Math.round((cats.seo?.score || 0) * 100),
+               audits['largest-contentful-paint']?.numericValue ? (audits['largest-contentful-paint'].numericValue / 1000).toFixed(2) : null,
+               audits['cumulative-layout-shift']?.numericValue ? audits['cumulative-layout-shift'].numericValue.toFixed(3) : null,
+               audits['first-contentful-paint']?.numericValue ? Math.round(audits['first-contentful-paint'].numericValue) : null,
+               audits['server-response-time']?.numericValue ? Math.round(audits['server-response-time'].numericValue) : null,
+               audits['speed-index']?.numericValue ? Math.round(audits['speed-index'].numericValue) : null
+              ]);
+            console.log(`PageSpeed [${strategy}]: ${m.url} done`);
+          } catch (err) {
+            console.error(`PageSpeed [${strategy}] error for ${m.url}:`, err.message);
+          }
+        });
+      }
+    }
+    console.log(`PageSpeed for project ${req.params.id}: complete`);
+  } catch (err) {
+    console.error('Run project PageSpeed error:', err);
+    req.flash('error', 'Failed to start PageSpeed checks');
+    res.redirect(`/admin/projects/${req.params.id}`);
   }
 });
 

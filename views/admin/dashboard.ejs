@@ -46,16 +46,9 @@
   <!-- Actions -->
   <div class="flex justify-between items-center mb-5">
     <h2 class="text-base font-semibold text-slate-700">All Projects</h2>
-    <div class="flex items-center gap-2">
-      <form action="/admin/run-pagespeed" method="POST" class="inline">
-        <button type="submit" class="px-3 py-2 rounded-xl text-sm font-medium text-primary-600 border border-primary-200 hover:bg-primary-50 transition-colors flex items-center gap-1.5">
-          <i data-lucide="gauge" class="w-4 h-4"></i> Run PageSpeed
-        </button>
-      </form>
-      <a href="/admin/projects/new" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-primary-700 hover:to-primary-800 transition-all shadow-sm shadow-primary-500/25 flex items-center gap-2">
-        <i data-lucide="plus" class="w-4 h-4"></i> Add Project
-      </a>
-    </div>
+    <a href="/admin/projects/new" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-primary-700 hover:to-primary-800 transition-all shadow-sm shadow-primary-500/25 flex items-center gap-2">
+      <i data-lucide="plus" class="w-4 h-4"></i> Add Project
+    </a>
   </div>
 
   <% if (websites.length === 0) { %>
@@ -72,7 +65,7 @@
   <% } else { %>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
       <% websites.forEach(function(website) { %>
-        <a href="/admin/projects/<%= website.id %>" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 card-hover block group">
+        <div onclick="window.location='/admin/projects/<%= website.id %>'" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 card-hover cursor-pointer group">
           <div class="flex items-start justify-between mb-4">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl <%= parseInt(website.down_count) > 0 ? 'bg-red-50' : parseInt(website.monitor_count) === 0 ? 'bg-slate-100' : 'bg-green-50' %> flex items-center justify-center flex-shrink-0">
@@ -104,7 +97,7 @@
               <span class="text-xs font-medium px-2 py-1 rounded-lg bg-red-50 text-red-600 status-pulse"><%= website.down_count %> down</span>
             <% } %>
           </div>
-        </a>
+        </div>
       <% }); %>
     </div>
   <% } %>
