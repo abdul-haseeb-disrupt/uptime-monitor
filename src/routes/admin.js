@@ -409,4 +409,19 @@ router.post('/users/:id/delete', async (req, res) => {
   }
 });
 
+// Trigger PageSpeed checks manually
+router.post('/run-pagespeed', async (req, res) => {
+  try {
+    const { runPageSpeedChecks } = require('../engine/pagespeed');
+    req.flash('success', 'PageSpeed checks started! This will take ~15-25 minutes for all pages.');
+    res.redirect('/admin');
+    // Run in background after response
+    runPageSpeedChecks().catch(err => console.error('Manual PageSpeed run error:', err.message));
+  } catch (err) {
+    console.error('Run PageSpeed error:', err);
+    req.flash('error', 'Failed to start PageSpeed checks');
+    res.redirect('/admin');
+  }
+});
+
 module.exports = router;

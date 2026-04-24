@@ -46,10 +46,16 @@
   <!-- Actions -->
   <div class="flex justify-between items-center mb-5">
     <h2 class="text-base font-semibold text-slate-700">All Projects</h2>
-    <a href="/admin/projects/new" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-primary-700 hover:to-primary-800 transition-all shadow-sm shadow-primary-500/25 flex items-center gap-2">
-      <i data-lucide="plus" class="w-4 h-4"></i>
-      Add Project
-    </a>
+    <div class="flex items-center gap-2">
+      <form action="/admin/run-pagespeed" method="POST" class="inline">
+        <button type="submit" class="px-3 py-2 rounded-xl text-sm font-medium text-primary-600 border border-primary-200 hover:bg-primary-50 transition-colors flex items-center gap-1.5">
+          <i data-lucide="gauge" class="w-4 h-4"></i> Run PageSpeed
+        </button>
+      </form>
+      <a href="/admin/projects/new" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-primary-700 hover:to-primary-800 transition-all shadow-sm shadow-primary-500/25 flex items-center gap-2">
+        <i data-lucide="plus" class="w-4 h-4"></i> Add Project
+      </a>
+    </div>
   </div>
 
   <% if (websites.length === 0) { %>

@@ -124,7 +124,7 @@ function startPageSpeedScheduler() {
   // Run 30s after startup if no data exists
   setTimeout(async () => {
     try {
-      const { rows } = await db.query('SELECT COUNT(*) as c FROM pagespeed_checks WHERE strategy IS NOT NULL AND performance > 0');
+      const { rows } = await db.query("SELECT COUNT(*) as c FROM pagespeed_checks WHERE strategy = 'desktop' AND performance > 0");
       const count = parseInt(rows[0].c);
       if (count === 0) {
         console.log('PageSpeed: No valid data found, running initial checks...');
