@@ -76,8 +76,7 @@
           <thead>
             <tr class="bg-slate-50 border-b border-slate-200">
               <th class="text-left px-4 py-3 text-xs font-semibold text-slate-600">Service</th>
-              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">Uptime Graph</th>
-              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">Uptime %</th>
+              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600" colspan="2">Uptime</th>
               <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">Performance</th>
               <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">Accessibility</th>
               <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">Best Practices</th>
@@ -140,10 +139,10 @@
 
                 <!-- Uptime bar -->
                 <td class="px-2 py-2.5">
-                  <% ['7', '30', '90'].forEach(function(days) { %>
-                    <div x-show="uptimeRange === '<%= days === '7' ? '7d' : days === '30' ? '30d' : '90d' %>' || (uptimeRange === '24h' && '<%= days %>' === '7')" x-cloak
+                  <% ['24h', '7', '30', '90'].forEach(function(period) { %>
+                    <div x-show="uptimeRange === '<%= period === '24h' ? '24h' : period + 'd' %>'" x-cloak
                       class="flex gap-[2px] items-end h-7 min-w-[280px] mx-auto">
-                      <% (monitor.dailyUptime[days] || []).forEach(function(day) { %>
+                      <% (monitor.dailyUptime[period] || []).forEach(function(day) { %>
                         <% let c = 'bg-slate-200'; if (day.uptime !== null) { if (day.uptime >= 99.9) c = 'bg-emerald-500'; else if (day.uptime >= 99) c = 'bg-emerald-400'; else if (day.uptime >= 95) c = 'bg-amber-400'; else c = 'bg-red-500'; } %>
                         <div class="<%= c %> rounded-[2px] flex-1 hover:opacity-75 transition-opacity" style="min-width:2px; height:<%= day.uptime !== null ? Math.max(8, (day.uptime/100)*28) : 4 %>px;" title="<%= day.day %>: <%= day.uptime !== null ? day.uptime.toFixed(1)+'%' : 'No data' %>"></div>
                       <% }); %>

@@ -70,4 +70,40 @@ async function getDailyUptime(monitorId, days) {
   return result;
 }
 
-module.exports = { getMonitorStats, getDailyUptime };
+async function getHourlyUptime(monitorId) {
+  const { rows } = await db.query(
+    `SELECT
+      DATE_TRUNC('hour', checked_at) as hour,
+      COUNT(*) as total,
+      COUNT(CASE WHEN status = 'up' THEN 1 END) as up_count
+     FROM checks
+     WHERE monitor_id = $1 AND checked_at > NOW() - INTERVAL '24 hours'
+     GROUP BY DATE_TRUNC('hour', checked_at)
+     ORDER BY hour ASC`,
+    [monitorId]
+  );
+
+  const result = [];
+  const now = new Date();
+  for (let i = 23; i >= 0; i--) {
+    const date = new Date(now);
+    date.setHours(date.getHours() - i, 0, 0, 0);
+    const hourStr = date.toISOString().slice(0, 13);
+
+    const found = rows.find(r => new Date(r.hour).toISOString().slice(0, 13) === hourStr);
+    if (found) {
+      const total = parseInt(found.total);
+      const up = parseInt(found.up_count);
+      result.push({
+        day: date.toISOString().slice(11, 16),
+        uptime: total > 0 ? (up / total) * 100 : null
+      });
+    } else {
+      result.push({ day: date.toISOString().slice(11, 16), uptime: null });
+    }
+  }
+
+  return result;
+}
+
+module.exports = { getMonitorStats, getDailyUptime, getHourlyUptime };

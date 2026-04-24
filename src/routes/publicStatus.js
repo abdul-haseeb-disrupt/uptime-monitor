@@ -30,6 +30,7 @@ router.get('/:slug', async (req, res) => {
     for (const monitor of monitors) {
       monitor.stats = await statsService.getMonitorStats(monitor.id);
       monitor.dailyUptime = {
+        '24h': await statsService.getHourlyUptime(monitor.id),
         '7': await statsService.getDailyUptime(monitor.id, 7),
         '30': await statsService.getDailyUptime(monitor.id, 30),
         '90': await statsService.getDailyUptime(monitor.id, 90)
