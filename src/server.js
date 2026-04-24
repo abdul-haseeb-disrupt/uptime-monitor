@@ -3,6 +3,7 @@ const runMigrations = require('./db/migrate');
 const app = require('./app');
 const { startScheduler } = require('./engine/scheduler');
 const { startRetention } = require('./engine/retention');
+const { startPageSpeedScheduler } = require('./engine/pagespeed');
 
 async function start() {
   try {
@@ -14,6 +15,9 @@ async function start() {
 
     console.log('Starting data retention job...');
     startRetention();
+
+    console.log('Starting PageSpeed scheduler...');
+    startPageSpeedScheduler();
 
     app.listen(env.PORT, () => {
       console.log(`Uptime Monitor running on port ${env.PORT}`);

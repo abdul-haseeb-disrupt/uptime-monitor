@@ -25,10 +25,12 @@ router.get('/:slug', async (req, res) => {
       [pages[0].id]
     );
 
-    // Get stats and daily uptime for each monitor
+    // Get stats, daily uptime, and pagespeed for each monitor
+    const { getLatestScores } = require('../engine/pagespeed');
     for (const monitor of monitors) {
       monitor.stats = await statsService.getMonitorStats(monitor.id);
       monitor.dailyUptime = await statsService.getDailyUptime(monitor.id, 90);
+      monitor.pagespeed = await getLatestScores(monitor.id);
     }
 
     // Recent incidents (last 30 days)

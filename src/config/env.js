@@ -5,7 +5,8 @@ const env = {
   SESSION_SECRET: process.env.SESSION_SECRET || 'dev-secret-change-me',
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: parseInt(process.env.PORT, 10) || 3000,
-  APP_URL: process.env.APP_URL || 'http://localhost:3000'
+  APP_URL: process.env.APP_URL || 'http://localhost:3000',
+  PSI_API_KEY: process.env.PSI_API_KEY || ''
 };
 
 if (!env.DATABASE_URL) {

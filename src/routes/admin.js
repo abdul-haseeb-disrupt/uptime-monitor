@@ -98,8 +98,9 @@ router.get('/projects/:id', async (req, res) => {
       [req.params.id]
     );
 
-    // Get latest check + stats for each monitor
+    // Get latest check + stats + pagespeed for each monitor
     const statsService = require('../services/statsService');
+    const { getLatestScores } = require('../engine/pagespeed');
     for (const monitor of monitors) {
       const { rows: checks } = await db.query(
         'SELECT * FROM checks WHERE monitor_id = $1 ORDER BY checked_at DESC LIMIT 1',
@@ -108,6 +109,7 @@ router.get('/projects/:id', async (req, res) => {
       monitor.lastCheck = checks[0] || null;
       monitor.stats = await statsService.getMonitorStats(monitor.id);
       monitor.dailyUptime = await statsService.getDailyUptime(monitor.id, 90);
+      monitor.pagespeed = await getLatestScores(monitor.id);
     }
 
     // Assigned users

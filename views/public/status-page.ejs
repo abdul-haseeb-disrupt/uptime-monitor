@@ -27,9 +27,10 @@
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6">
       <!-- Table header -->
       <div class="grid grid-cols-12 gap-2 px-4 py-2.5 bg-slate-50 border-b border-slate-200 text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
-        <div class="col-span-4">Service</div>
-        <div class="col-span-5 text-center">90-Day Uptime</div>
+        <div class="col-span-3">Service</div>
+        <div class="col-span-4 text-center">90-Day Uptime</div>
         <div class="col-span-1 text-center">Uptime</div>
+        <div class="col-span-2 text-center">Speed</div>
         <div class="col-span-2 text-right">Status</div>
       </div>
 
@@ -37,7 +38,7 @@
       <% monitors.forEach(function(monitor, index) { %>
         <div class="grid grid-cols-12 gap-2 px-4 py-2.5 items-center <%= index < monitors.length - 1 ? 'border-b border-slate-100' : '' %> hover:bg-slate-50/50 transition-colors">
           <!-- Name + URL -->
-          <div class="col-span-4 flex items-center gap-2 min-w-0">
+          <div class="col-span-3 flex items-center gap-2 min-w-0">
             <span class="w-2 h-2 rounded-full flex-shrink-0
               <%= monitor.status === 'up' ? 'bg-emerald-500' : monitor.status === 'down' ? 'bg-red-500 status-pulse' : 'bg-slate-300' %>"></span>
             <div class="min-w-0">
@@ -49,7 +50,7 @@
           </div>
 
           <!-- Uptime bar -->
-          <div class="col-span-5 px-1">
+          <div class="col-span-4 px-1">
             <% if (monitor.dailyUptime) { %>
               <div class="flex gap-[1px] items-end h-4">
                 <% monitor.dailyUptime.forEach(function(day) { %>
@@ -72,6 +73,20 @@
           <div class="col-span-1 text-center">
             <% var up30 = monitor.stats ? monitor.stats.uptime_30d : null; %>
             <span class="text-xs font-bold <%= up30 && up30 >= 99 ? 'text-emerald-600' : up30 && up30 < 99 ? 'text-red-600' : 'text-slate-400' %>"><%= up30 ? up30 + '%' : '-' %></span>
+          </div>
+
+          <!-- PageSpeed -->
+          <div class="col-span-2 text-center">
+            <% if (monitor.pagespeed) { %>
+              <span class="inline-flex items-center gap-1 text-xs font-bold
+                <%= monitor.pagespeed.performance >= 90 ? 'text-emerald-600' : monitor.pagespeed.performance >= 50 ? 'text-amber-600' : 'text-red-600' %>">
+                <span class="w-1.5 h-1.5 rounded-full
+                  <%= monitor.pagespeed.performance >= 90 ? 'bg-emerald-500' : monitor.pagespeed.performance >= 50 ? 'bg-amber-500' : 'bg-red-500' %>"></span>
+                <%= monitor.pagespeed.performance %>
+              </span>
+            <% } else { %>
+              <span class="text-[10px] text-slate-300">-</span>
+            <% } %>
           </div>
 
           <!-- Status badge -->
