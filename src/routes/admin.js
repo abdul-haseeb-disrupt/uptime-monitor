@@ -78,16 +78,41 @@ router.post('/projects', async (req, res) => {
       [req.session.userId, name.trim(), (base_url || '').trim(), sitemapList, sitemap_auto_sync === 'on']
     );
 
+    const projectId = rows[0].id;
+
+    // Auto-create status page
+    const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    try {
+      await db.query(
+        'INSERT INTO status_pages (user_id, title, slug, description) VALUES ($1, $2, $3, $4) ON CONFLICT (slug) DO NOTHING',
+        [req.session.userId, name.trim() + ' Status', slug, 'Current status of ' + name.trim()]
+      );
+    } catch (e) { /* slug conflict, skip */ }
+
     // If sitemaps provided, sync immediately
     if (sitemapList.length > 0) {
       const { syncWebsiteSitemaps } = require('../engine/sitemapSync');
-      const result = await syncWebsiteSitemaps(rows[0].id);
-      req.flash('success', `Project created! ${result.added} pages imported from sitemap.`);
+      const result = await syncWebsiteSitemaps(projectId);
+      req.flash('success', `Project created! ${result.added} pages imported. Status page: /status/${slug}`);
     } else {
-      req.flash('success', 'Project created! Now add pages to monitor.');
+      req.flash('success', `Project created! Status page: /status/${slug}`);
     }
 
-    res.redirect(`/admin/projects/${rows[0].id}`);
+    // Auto-assign all monitors to status page
+    try {
+      const { rows: statusPage } = await db.query('SELECT id FROM status_pages WHERE slug = $1', [slug]);
+      if (statusPage[0]) {
+        const { rows: monitors } = await db.query('SELECT id FROM monitors WHERE website_id = $1', [projectId]);
+        for (let i = 0; i < monitors.length; i++) {
+          await db.query(
+            'INSERT INTO status_page_monitors (status_page_id, monitor_id, sort_order) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
+            [statusPage[0].id, monitors[i].id, i]
+          );
+        }
+      }
+    } catch (e) { console.error('Auto status page monitors error:', e.message); }
+
+    res.redirect(`/admin/projects/${projectId}`);
   } catch (err) {
     console.error('Create project error:', err);
     req.flash('error', 'Failed to create project');
@@ -254,6 +279,20 @@ router.post('/projects/:id/pages', async (req, res) => {
     // Notify scheduler
     const scheduler = require('../engine/scheduler');
     scheduler.addMonitor(rows[0].id);
+
+    // Auto-add to project's status page
+    try {
+      const { rows: website } = await db.query('SELECT name FROM websites WHERE id = $1', [websiteId]);
+      if (website[0]) {
+        const slug = website[0].name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+        const { rows: sp } = await db.query('SELECT id FROM status_pages WHERE slug = $1', [slug]);
+        if (sp[0]) {
+          const { rows: maxOrder } = await db.query('SELECT COALESCE(MAX(sort_order), 0) + 1 as next FROM status_page_monitors WHERE status_page_id = $1', [sp[0].id]);
+          await db.query('INSERT INTO status_page_monitors (status_page_id, monitor_id, sort_order) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING',
+            [sp[0].id, rows[0].id, maxOrder[0].next]);
+        }
+      }
+    } catch (e) { /* skip */ }
 
     req.flash('success', 'Page added!');
     res.redirect(`/admin/projects/${websiteId}`);
