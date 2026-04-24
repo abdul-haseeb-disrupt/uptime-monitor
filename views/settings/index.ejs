@@ -34,12 +34,10 @@
         <input type="url" name="slack_webhook_url" value="<%= user.slack_webhook_url || '' %>" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="https://hooks.slack.com/services/...">
         <p class="text-xs text-gray-400 mt-1">Get this from your Slack workspace's Incoming Webhooks app</p>
       </div>
-      <div class="flex gap-3">
-        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700">Save Webhook</button>
-        <form action="/settings/test-slack" method="POST" class="inline">
-          <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium text-blue-600 border border-blue-200 hover:bg-blue-50">Test Slack Alert</button>
-        </form>
-      </div>
+      <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700">Save Webhook</button>
+    </form>
+    <form action="/settings/test-slack" method="POST" class="mt-3">
+      <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium text-blue-600 border border-blue-200 hover:bg-blue-50">Test Slack Alert</button>
     </form>
   </div>
 
