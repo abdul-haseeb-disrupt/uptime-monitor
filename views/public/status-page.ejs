@@ -118,8 +118,8 @@
 
                 <!-- Uptime % -->
                 <td class="px-2 py-2.5 text-center">
-                  <% var up30 = monitor.stats ? monitor.stats.uptime_30d : null; %>
-                  <span class="text-xs font-bold <%= up30 && up30 >= 99 ? 'text-emerald-600' : up30 && up30 < 99 ? 'text-red-600' : 'text-slate-400' %>"><%= up30 ? up30 + '%' : '-' %></span>
+                  <% var up24 = monitor.stats ? monitor.stats.uptime_24h : null; %>
+                  <span class="text-xs font-bold <%= up24 && up24 >= 99 ? 'text-emerald-600' : up24 && up24 < 99 ? 'text-red-600' : 'text-slate-400' %>"><%= up24 ? up24 + '%' : '-' %></span>
                 </td>
 
                 <!-- PageSpeed scores - switched by toggle -->
