@@ -1,6 +1,6 @@
-<div class="fade-in">
+<div class="fade-in" x-data="{ device: 'desktop' }">
   <!-- Breadcrumb + Actions -->
-  <div class="flex items-center justify-between mb-6">
+  <div class="flex items-center justify-between mb-5">
     <div>
       <div class="flex items-center gap-2 text-sm text-slate-400 mb-1">
         <a href="/admin" class="hover:text-primary-600 transition-colors">All Projects</a>
@@ -21,29 +21,27 @@
           </button>
         </form>
       <% } %>
-      <a href="/admin/projects/<%= website.id %>/pages/new" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-primary-700 hover:to-primary-800 shadow-sm shadow-primary-500/25 flex items-center gap-2 transition-all">
+      <a href="/admin/projects/<%= website.id %>/pages/new" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:from-primary-700 hover:to-primary-800 shadow-sm shadow-primary-500/25 flex items-center gap-2">
         <i data-lucide="plus" class="w-4 h-4"></i> Add Page
       </a>
-      <a href="/admin/projects/<%= website.id %>/edit" class="px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors">
+      <a href="/admin/projects/<%= website.id %>/edit" class="px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 border border-slate-200">
         <i data-lucide="pencil" class="w-4 h-4"></i>
       </a>
       <form action="/admin/projects/<%= website.id %>/delete" method="POST" onsubmit="return confirm('Delete this project and ALL its pages?')" class="inline">
-        <button type="submit" class="px-3 py-2 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 border border-red-200 transition-colors">
+        <button type="submit" class="px-3 py-2 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 border border-red-200">
           <i data-lucide="trash-2" class="w-4 h-4"></i>
         </button>
       </form>
     </div>
   </div>
 
-  <!-- Assigned Users -->
   <% if (assignedUsers.length > 0) { %>
-    <div class="bg-primary-50 border border-primary-200 rounded-xl p-3 mb-6 flex items-center gap-2">
+    <div class="bg-primary-50 border border-primary-200 rounded-xl p-3 mb-4 flex items-center gap-2">
       <i data-lucide="users" class="w-4 h-4 text-primary-600 flex-shrink-0"></i>
       <span class="text-sm text-primary-700">Assigned to: <strong><%= assignedUsers.map(u => u.name).join(', ') %></strong></span>
     </div>
   <% } %>
 
-  <!-- Pages List -->
   <% if (monitors.length === 0) { %>
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-16 text-center">
       <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4">
@@ -56,109 +54,148 @@
       </a>
     </div>
   <% } else { %>
-    <div class="space-y-3">
-      <% monitors.forEach(function(monitor) { %>
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 card-hover">
-          <!-- Header -->
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0
-                <%= monitor.status === 'up' ? 'bg-emerald-50' : monitor.status === 'down' ? 'bg-red-50' : monitor.status === 'paused' ? 'bg-slate-100' : 'bg-amber-50' %>">
-                <% if (monitor.status === 'up') { %>
-                  <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-500"></i>
-                <% } else if (monitor.status === 'down') { %>
-                  <i data-lucide="x-circle" class="w-5 h-5 text-red-500 status-pulse"></i>
-                <% } else if (monitor.status === 'paused') { %>
-                  <i data-lucide="pause-circle" class="w-5 h-5 text-slate-400"></i>
-                <% } else { %>
-                  <i data-lucide="help-circle" class="w-5 h-5 text-amber-500"></i>
-                <% } %>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="font-semibold text-slate-800"><%= monitor.name %></span>
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 uppercase"><%= monitor.type %></span>
-                </div>
-                <div class="text-xs text-slate-400 mt-0.5 truncate max-w-md">
-                  <% if (monitor.url) { %><%= monitor.url %><% } %>
-                  <% if (monitor.hostname) { %><%= monitor.hostname %><% if (monitor.port) { %>:<%= monitor.port %><% } %><% } %>
-                </div>
-              </div>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <form action="/admin/projects/<%= website.id %>/pages/<%= monitor.id %>/toggle" method="POST" class="inline">
-                <button type="submit" class="p-1.5 rounded-lg border transition-colors <%= monitor.is_active ? 'text-amber-500 border-amber-200 hover:bg-amber-50' : 'text-emerald-500 border-emerald-200 hover:bg-emerald-50' %>" title="<%= monitor.is_active ? 'Pause' : 'Resume' %>">
-                  <i data-lucide="<%= monitor.is_active ? 'pause' : 'play' %>" class="w-3.5 h-3.5"></i>
-                </button>
-              </form>
-              <form action="/admin/projects/<%= website.id %>/pages/<%= monitor.id %>/delete" method="POST" onsubmit="return confirm('Delete this page?')" class="inline">
-                <button type="submit" class="p-1.5 rounded-lg border text-red-400 border-red-200 hover:bg-red-50 transition-colors" title="Delete">
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
-              </form>
-            </div>
-          </div>
 
-          <!-- Stats row -->
-          <div class="grid grid-cols-4 gap-2 mb-3">
-            <% ['24h', '7d', '30d'].forEach(function(period) { %>
-              <div class="text-center p-2 rounded-lg bg-slate-50">
-                <div class="text-[10px] font-medium text-slate-400 uppercase"><%= period %></div>
-                <% var val = monitor.stats ? monitor.stats['uptime_' + period] : null; %>
-                <div class="text-sm font-bold mt-0.5 <%= val && val >= 99 ? 'text-emerald-600' : val && val < 99 ? 'text-red-600' : 'text-slate-400' %>"><%= val ? val + '%' : 'N/A' %></div>
-              </div>
-            <% }); %>
-            <div class="text-center p-2 rounded-lg bg-slate-50">
-              <div class="text-[10px] font-medium text-slate-400 uppercase">Resp</div>
-              <div class="text-sm font-bold mt-0.5 text-slate-600"><%= monitor.stats && monitor.stats.avg_response_24h ? monitor.stats.avg_response_24h + 'ms' : 'N/A' %></div>
-            </div>
-          </div>
+    <!-- Device toggle -->
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-sm text-slate-500"><%= monitors.length %> pages</span>
+      <div class="inline-flex items-center bg-slate-100 rounded-lg p-0.5">
+        <button @click="device = 'desktop'"
+          :class="device === 'desktop' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all">
+          <i data-lucide="monitor" class="w-3.5 h-3.5"></i> Desktop
+        </button>
+        <button @click="device = 'mobile'"
+          :class="device === 'mobile' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700'"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Mobile
+        </button>
+      </div>
+    </div>
 
-          <!-- PageSpeed scores (Mobile + Desktop) -->
-          <% if (monitor.pagespeed) { %>
-            <% ['mobile', 'desktop'].forEach(function(strategy) { %>
-              <% var ps = monitor.pagespeed['24h'] ? monitor.pagespeed['24h'][strategy] : null; %>
-              <% if (ps) { %>
-                <div class="mb-2">
-                  <div class="text-[10px] font-semibold text-slate-400 uppercase mb-1.5 flex items-center gap-1">
-                    <i data-lucide="<%= strategy === 'mobile' ? 'smartphone' : 'monitor' %>" class="w-3 h-3"></i> <%= strategy %>
-                  </div>
-                  <div class="grid grid-cols-4 gap-2">
-                    <% [
-                      { label: 'Perf', val: ps.performance },
-                      { label: 'A11y', val: ps.accessibility },
-                      { label: 'BP', val: ps.best_practices },
-                      { label: 'SEO', val: ps.seo }
-                    ].forEach(function(item) { %>
-                      <div class="text-center p-1.5 rounded-lg border
-                        <%= item.val >= 90 ? 'bg-emerald-50 border-emerald-200' : item.val >= 50 ? 'bg-amber-50 border-amber-200' : 'bg-red-50 border-red-200' %>">
-                        <div class="text-[9px] font-medium text-slate-500 uppercase"><%= item.label %></div>
-                        <div class="text-base font-bold <%= item.val >= 90 ? 'text-emerald-600' : item.val >= 50 ? 'text-amber-600' : 'text-red-600' %>"><%= item.val %></div>
+    <%
+      function sc(val) {
+        if (val === null || val === undefined) return 'text-slate-300';
+        if (val >= 90) return 'text-emerald-600 bg-emerald-50';
+        if (val >= 50) return 'text-amber-600 bg-amber-50';
+        return 'text-red-600 bg-red-50';
+      }
+    %>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+              <th class="text-left px-4 py-3 text-xs font-semibold text-slate-600">Page</th>
+              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">24 Hours</th>
+              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">7 Days</th>
+              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">30 Days</th>
+              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">Response</th>
+              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">Performance</th>
+              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">Accessibility</th>
+              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">Best Practices</th>
+              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">SEO</th>
+              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">LCP</th>
+              <th class="text-center px-2 py-3 text-xs font-semibold text-slate-600">CLS</th>
+              <th class="text-right px-3 py-3 text-xs font-semibold text-slate-600">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% monitors.forEach(function(monitor, index) { %>
+              <%
+                var ps = null;
+                if (monitor.pagespeed && monitor.pagespeed['24h']) {
+                  ps = monitor.pagespeed['24h'];
+                }
+              %>
+              <tr class="<%= index < monitors.length - 1 ? 'border-b border-slate-100' : '' %> hover:bg-slate-50/50 transition-colors"
+                x-data='{ ps: <%= JSON.stringify({
+                  mobile: ps && ps.mobile ? { performance: parseInt(ps.mobile.performance)||null, accessibility: parseInt(ps.mobile.accessibility)||null, best_practices: parseInt(ps.mobile.best_practices)||null, seo: parseInt(ps.mobile.seo)||null, lcp: ps.mobile.lcp?parseFloat(ps.mobile.lcp):null, cls: ps.mobile.cls!==null?parseFloat(ps.mobile.cls):null } : null,
+                  desktop: ps && ps.desktop ? { performance: parseInt(ps.desktop.performance)||null, accessibility: parseInt(ps.desktop.accessibility)||null, best_practices: parseInt(ps.desktop.best_practices)||null, seo: parseInt(ps.desktop.seo)||null, lcp: ps.desktop.lcp?parseFloat(ps.desktop.lcp):null, cls: ps.desktop.cls!==null?parseFloat(ps.desktop.cls):null } : null
+                }) %>,
+                  g(f) { let d = this.ps[device]; return d ? d[f] : null; },
+                  sc(v) { if(!v&&v!==0) return "text-slate-300"; if(v>=90) return "text-emerald-600 bg-emerald-50"; if(v>=50) return "text-amber-600 bg-amber-50"; return "text-red-600 bg-red-50"; },
+                  lc(v) { if(!v) return "text-slate-300"; if(v<=2.5) return "text-emerald-600"; if(v<=4) return "text-amber-600"; return "text-red-600"; },
+                  cc(v) { if(v===null||v===undefined) return "text-slate-300"; if(v<=0.1) return "text-emerald-600"; if(v<=0.25) return "text-amber-600"; return "text-red-600"; }
+                }'>
+                <!-- Page name -->
+                <td class="px-4 py-2.5">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="w-2 h-2 rounded-full flex-shrink-0
+                      <%= monitor.status === 'up' ? 'bg-emerald-500' : monitor.status === 'down' ? 'bg-red-500 status-pulse' : monitor.status === 'paused' ? 'bg-slate-300' : 'bg-amber-400' %>"></span>
+                    <div class="min-w-0">
+                      <div class="text-sm font-medium text-slate-700 truncate max-w-[180px]"><%= monitor.name %></div>
+                      <div class="text-[10px] text-slate-400 truncate max-w-[180px]">
+                        <% if (monitor.url) { %><%= monitor.url.replace(/^https?:\/\//, '') %><% } %>
+                        <% if (monitor.hostname) { %><%= monitor.hostname %><% if (monitor.port) { %>:<%= monitor.port %><% } %><% } %>
                       </div>
-                    <% }); %>
+                    </div>
                   </div>
-                  <div class="flex items-center gap-3 text-[10px] text-slate-400 mt-1 px-1">
-                    <% if (ps.lcp) { %><span>LCP: <strong class="<%= ps.lcp <= 2.5 ? 'text-emerald-600' : ps.lcp <= 4 ? 'text-amber-600' : 'text-red-600' %>"><%= ps.lcp %>s</strong></span><% } %>
-                    <% if (ps.cls !== null && ps.cls !== undefined) { %><span>CLS: <strong class="<%= ps.cls <= 0.1 ? 'text-emerald-600' : ps.cls <= 0.25 ? 'text-amber-600' : 'text-red-600' %>"><%= ps.cls %></strong></span><% } %>
-                    <% if (ps.fcp) { %><span>FCP: <strong><%= ps.fcp %>ms</strong></span><% } %>
-                    <% if (ps.ttfb) { %><span>TTFB: <strong><%= ps.ttfb %>ms</strong></span><% } %>
+                </td>
+
+                <!-- Uptime 24h -->
+                <td class="px-2 py-2.5 text-center">
+                  <% var u24 = monitor.stats ? monitor.stats.uptime_24h : null; %>
+                  <span class="text-xs font-bold <%= u24 && u24 >= 99 ? 'text-emerald-600' : u24 && u24 < 99 ? 'text-red-600' : 'text-slate-400' %>"><%= u24 ? u24 + '%' : '-' %></span>
+                </td>
+
+                <!-- Uptime 7d -->
+                <td class="px-2 py-2.5 text-center">
+                  <% var u7 = monitor.stats ? monitor.stats.uptime_7d : null; %>
+                  <span class="text-xs font-bold <%= u7 && u7 >= 99 ? 'text-emerald-600' : u7 && u7 < 99 ? 'text-red-600' : 'text-slate-400' %>"><%= u7 ? u7 + '%' : '-' %></span>
+                </td>
+
+                <!-- Uptime 30d -->
+                <td class="px-2 py-2.5 text-center">
+                  <% var u30 = monitor.stats ? monitor.stats.uptime_30d : null; %>
+                  <span class="text-xs font-bold <%= u30 && u30 >= 99 ? 'text-emerald-600' : u30 && u30 < 99 ? 'text-red-600' : 'text-slate-400' %>"><%= u30 ? u30 + '%' : '-' %></span>
+                </td>
+
+                <!-- Response time -->
+                <td class="px-2 py-2.5 text-center">
+                  <span class="text-xs font-bold text-slate-600"><%= monitor.stats && monitor.stats.avg_response_24h ? monitor.stats.avg_response_24h + 'ms' : '-' %></span>
+                </td>
+
+                <!-- PageSpeed scores (dynamic mobile/desktop) -->
+                <td class="px-2 py-2.5 text-center">
+                  <span class="text-[11px] font-bold px-1.5 py-0.5 rounded" :class="sc(g('performance'))" x-text="g('performance') !== null ? g('performance') : '-'"></span>
+                </td>
+                <td class="px-2 py-2.5 text-center">
+                  <span class="text-[11px] font-bold px-1.5 py-0.5 rounded" :class="sc(g('accessibility'))" x-text="g('accessibility') !== null ? g('accessibility') : '-'"></span>
+                </td>
+                <td class="px-2 py-2.5 text-center">
+                  <span class="text-[11px] font-bold px-1.5 py-0.5 rounded" :class="sc(g('best_practices'))" x-text="g('best_practices') !== null ? g('best_practices') : '-'"></span>
+                </td>
+                <td class="px-2 py-2.5 text-center">
+                  <span class="text-[11px] font-bold px-1.5 py-0.5 rounded" :class="sc(g('seo'))" x-text="g('seo') !== null ? g('seo') : '-'"></span>
+                </td>
+                <td class="px-2 py-2.5 text-center">
+                  <span class="text-[11px] font-bold" :class="lc(g('lcp'))" x-text="g('lcp') !== null ? g('lcp') + 's' : '-'"></span>
+                </td>
+                <td class="px-2 py-2.5 text-center">
+                  <span class="text-[11px] font-bold" :class="cc(g('cls'))" x-text="g('cls') !== null ? g('cls') : '-'"></span>
+                </td>
+
+                <!-- Actions -->
+                <td class="px-3 py-2.5 text-right">
+                  <div class="flex items-center justify-end gap-1">
+                    <form action="/admin/projects/<%= website.id %>/pages/<%= monitor.id %>/toggle" method="POST" class="inline">
+                      <button type="submit" class="p-1 rounded-lg border transition-colors <%= monitor.is_active ? 'text-amber-500 border-amber-200 hover:bg-amber-50' : 'text-emerald-500 border-emerald-200 hover:bg-emerald-50' %>" title="<%= monitor.is_active ? 'Pause' : 'Resume' %>">
+                        <i data-lucide="<%= monitor.is_active ? 'pause' : 'play' %>" class="w-3 h-3"></i>
+                      </button>
+                    </form>
+                    <form action="/admin/projects/<%= website.id %>/pages/<%= monitor.id %>/delete" method="POST" onsubmit="return confirm('Delete?')" class="inline">
+                      <button type="submit" class="p-1 rounded-lg border text-red-400 border-red-200 hover:bg-red-50 transition-colors" title="Delete">
+                        <i data-lucide="trash-2" class="w-3 h-3"></i>
+                      </button>
+                    </form>
                   </div>
-                </div>
-              <% } %>
+                </td>
+              </tr>
             <% }); %>
-          <% } %>
-
-          <!-- Uptime bar -->
-          <%- include('../../partials/uptime-bar', { dailyUptime: monitor.dailyUptime }) %>
-
-          <% if (monitor.lastCheck) { %>
-            <div class="flex items-center gap-1.5 text-xs text-slate-400 mt-2">
-              <i data-lucide="clock" class="w-3 h-3"></i>
-              Last checked: <%= timeAgo(monitor.lastCheck.checked_at) %> &middot; <%= formatResponseTime(monitor.lastCheck.response_time) %>
-            </div>
-          <% } %>
-        </div>
-      <% }); %>
+          </tbody>
+        </table>
+      </div>
     </div>
   <% } %>
 </div>
