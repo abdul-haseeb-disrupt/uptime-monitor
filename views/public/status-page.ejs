@@ -36,11 +36,16 @@
       <!-- Monitor rows -->
       <% monitors.forEach(function(monitor, index) { %>
         <div class="grid grid-cols-12 gap-2 px-4 py-2.5 items-center <%= index < monitors.length - 1 ? 'border-b border-slate-100' : '' %> hover:bg-slate-50/50 transition-colors">
-          <!-- Name -->
+          <!-- Name + URL -->
           <div class="col-span-4 flex items-center gap-2 min-w-0">
             <span class="w-2 h-2 rounded-full flex-shrink-0
               <%= monitor.status === 'up' ? 'bg-emerald-500' : monitor.status === 'down' ? 'bg-red-500 status-pulse' : 'bg-slate-300' %>"></span>
-            <span class="text-sm font-medium text-slate-700 truncate"><%= monitor.display_name || monitor.name %></span>
+            <div class="min-w-0">
+              <div class="text-sm font-medium text-slate-700 truncate"><%= monitor.display_name || monitor.name %></div>
+              <% if (monitor.url) { %>
+                <div class="text-[10px] text-slate-400 truncate"><%= monitor.url.replace(/^https?:\/\//, '') %></div>
+              <% } %>
+            </div>
           </div>
 
           <!-- Uptime bar -->
