@@ -140,17 +140,30 @@
                   <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 transition-transform" :class="openRow === <%= monitor.id %> ? 'rotate-90' : ''"></i>
                 </td>
 
-                <!-- Page name -->
+                <!-- Page name + URL link + error -->
                 <td class="px-2 py-2.5">
                   <div class="flex items-center gap-2 min-w-0">
                     <span class="w-2 h-2 rounded-full flex-shrink-0
                       <%= monitor.status === 'up' ? 'bg-emerald-500' : monitor.status === 'down' ? 'bg-red-500 status-pulse' : monitor.status === 'paused' ? 'bg-slate-300' : 'bg-amber-400' %>"></span>
                     <div class="min-w-0">
-                      <div class="text-sm font-medium text-slate-700 truncate max-w-[180px]"><%= monitor.name %></div>
-                      <div class="text-[10px] text-slate-400 truncate max-w-[180px]">
+                      <div class="flex items-center gap-1.5">
+                        <span class="text-sm font-medium text-slate-700 truncate max-w-[160px]"><%= monitor.name %></span>
+                        <% if (monitor.url) { %>
+                          <a href="<%= monitor.url %>" target="_blank" @click.stop class="text-slate-400 hover:text-primary-600 transition-colors flex-shrink-0" title="Open page">
+                            <i data-lucide="external-link" class="w-3 h-3"></i>
+                          </a>
+                        <% } %>
+                      </div>
+                      <div class="text-[10px] text-slate-400 truncate max-w-[200px]">
                         <% if (monitor.url) { %><%= monitor.url.replace(/^https?:\/\//, '') %><% } %>
                         <% if (monitor.hostname) { %><%= monitor.hostname %><% if (monitor.port) { %>:<%= monitor.port %><% } %><% } %>
                       </div>
+                      <% if (monitor.status === 'down' && monitor.lastCheck && monitor.lastCheck.error_message) { %>
+                        <div class="text-[10px] text-red-500 truncate max-w-[200px] mt-0.5 flex items-center gap-1">
+                          <i data-lucide="alert-triangle" class="w-3 h-3 flex-shrink-0"></i>
+                          <%= monitor.lastCheck.error_message %>
+                        </div>
+                      <% } %>
                     </div>
                   </div>
                 </td>
