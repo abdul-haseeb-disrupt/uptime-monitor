@@ -18,7 +18,7 @@ async function parseSitemap(url) {
 
     // Smart filter: for sections like /blog, /news, /insights, /glossary, /resources
     // only keep the main section page, skip individual posts
-    const sectionPatterns = /\/(blog|news|insights|glossary|resources|articles|posts|newsroom|case-studies|casestudy|stories|press)\//i;
+    const sectionPatterns = /\/(blog|news|insights|glossary|resources|articles|posts|newsroom|case-studies|casestudy|stories|press|tool|tools|category|categories|tag|tags|author|authors|product|products|docs|documentation|help|support|faq|kb|knowledge-base|tutorial|tutorials|guide|guides|template|templates|integration|integrations|changelog|release|releases|event|events|webinar|webinars|podcast|podcasts|video|videos|review|reviews|comparison|comparisons|alternative|alternatives|use-case|use-cases|customer|customers|testimonial|testimonials|gallery|portfolio|work|project|projects)\//i;
     const sectionRoots = new Set();
     const urls = [];
 
