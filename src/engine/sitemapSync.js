@@ -43,7 +43,7 @@ async function parseSitemap(url) {
       }
     }
 
-    return urls;
+    return urls.slice(0, 50);
   } catch (err) {
     console.error(`Sitemap fetch error for ${url}:`, err.message);
     return [];
