@@ -1,4 +1,4 @@
-<div class="fade-in" x-data="{ device: 'desktop', period: '24h', openRow: null, ready: false }" x-init="$nextTick(() => { setTimeout(() => { ready = true }, 100) })">
+<div x-data="{ device: 'desktop', period: '24h', openRow: null, ready: false }" x-init="$nextTick(() => { lucide.createIcons(); setTimeout(() => { ready = true }, 150) })">
   <!-- Breadcrumb + Actions -->
   <div class="flex items-center justify-between mb-5">
     <div>
@@ -14,11 +14,14 @@
       <% } %>
     </div>
     <div class="flex gap-2">
-      <form action="/admin/projects/<%= website.id %>/run-pagespeed" method="POST" class="inline" x-data="{ running: false }" @submit="if(running){$event.preventDefault();return}; running=true; setTimeout(()=>running=false, 300000)">
-        <button type="submit" :disabled="running" class="px-3 py-2 rounded-xl text-sm font-medium border transition-colors flex items-center gap-1.5" :class="running ? 'text-slate-400 border-slate-200 cursor-not-allowed' : 'text-primary-600 border-primary-200 hover:bg-primary-50'">
-          <svg x-show="running" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-          <i x-show="!running" data-lucide="gauge" class="w-4 h-4"></i>
-          <span x-text="running ? 'Running...' : 'Run PageSpeed'"></span>
+      <form action="/admin/projects/<%= website.id %>/run-pagespeed" method="POST" class="inline"
+        x-data="{ clicked: false }"
+        @submit="if(clicked){$event.preventDefault();return}; clicked=true">
+        <button type="submit" :disabled="clicked"
+          class="px-3 py-2 rounded-xl text-sm font-medium border flex items-center gap-1.5"
+          :class="clicked ? 'text-slate-400 border-slate-200 cursor-not-allowed' : 'text-primary-600 border-primary-200 hover:bg-primary-50'">
+          <template x-if="!clicked"><span class="flex items-center gap-1.5"><i data-lucide="gauge" class="w-4 h-4"></i> Run PageSpeed</span></template>
+          <template x-if="clicked"><span class="flex items-center gap-1.5"><svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Running...</span></template>
         </button>
       </form>
       <% if (website.sitemaps && website.sitemaps.length > 0) { %>
@@ -91,12 +94,12 @@
     <!-- Loading spinner -->
     <div x-show="!ready" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
       <div class="inline-flex items-center gap-3 text-slate-400">
-        <svg class="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+        <svg class="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
         <span class="text-sm font-medium">Loading data...</span>
       </div>
     </div>
 
-    <div x-show="ready" x-cloak class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div x-show="ready" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead>
