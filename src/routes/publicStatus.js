@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
         COUNT(m.id) as monitor_count,
         COUNT(CASE WHEN m.status = 'down' THEN 1 END) as down_count
        FROM websites w
-       LEFT JOIN monitors m ON m.website_id = w.id
+       LEFT JOIN monitors m ON m.website_id = w.id AND m.is_active = true
        GROUP BY w.id ORDER BY w.name ASC`
     );
 
@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 
     for (const website of websites) {
       const { rows: monitors } = await db.query(
-        'SELECT * FROM monitors WHERE website_id = $1 ORDER BY created_at ASC',
+        'SELECT * FROM monitors WHERE website_id = $1 AND is_active = true ORDER BY created_at ASC',
         [website.id]
       );
       for (const monitor of monitors) {
@@ -87,13 +87,13 @@ router.get('/:slug', async (req, res) => {
       return res.status(404).render('error', { layout: 'layouts/public', title: '404', message: 'Status page not found' });
     }
 
-    // Get monitors for this status page
+    // Get monitors for this status page (hide paused)
     const { rows: monitors } = await db.query(
       `SELECT m.*, spm.display_name, spm.sort_order, w.name as website_name
        FROM status_page_monitors spm
        JOIN monitors m ON m.id = spm.monitor_id
        JOIN websites w ON w.id = m.website_id
-       WHERE spm.status_page_id = $1
+       WHERE spm.status_page_id = $1 AND m.is_active = true
        ORDER BY spm.sort_order`,
       [pages[0].id]
     );
