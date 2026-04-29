@@ -53,48 +53,6 @@ router.get('/', async (req, res) => {
 });
 
 // ============================================
-// ADMIN STATUS PAGE - All projects in one view
-// ============================================
-router.get('/status', async (req, res) => {
-  try {
-    const { rows: websites } = await db.query(
-      `SELECT w.*,
-        COUNT(m.id) as monitor_count,
-        COUNT(CASE WHEN m.status = 'up' THEN 1 END) as up_count,
-        COUNT(CASE WHEN m.status = 'down' THEN 1 END) as down_count
-       FROM websites w
-       LEFT JOIN monitors m ON m.website_id = w.id
-       GROUP BY w.id ORDER BY w.name ASC`
-    );
-
-    const statsService = require('../services/statsService');
-    const { getLatestScores } = require('../engine/pagespeed');
-    const projectMonitors = {};
-
-    for (const website of websites) {
-      const { rows: monitors } = await db.query(
-        'SELECT * FROM monitors WHERE website_id = $1 ORDER BY created_at ASC', [website.id]
-      );
-      for (const monitor of monitors) {
-        const { rows: checks } = await db.query(
-          'SELECT * FROM checks WHERE monitor_id = $1 ORDER BY checked_at DESC LIMIT 1', [monitor.id]
-        );
-        monitor.lastCheck = checks[0] || null;
-        monitor.stats = await statsService.getMonitorStats(monitor.id);
-        monitor.pagespeed = await getLatestScores(monitor.id);
-      }
-      projectMonitors[website.id] = monitors;
-    }
-
-    res.render('admin/status', { title: 'Status Overview', websites, projectMonitors });
-  } catch (err) {
-    console.error('Admin status error:', err);
-    req.flash('error', 'Failed to load status');
-    res.redirect('/admin');
-  }
-});
-
-// ============================================
 // PROJECT MANAGEMENT
 // ============================================
 
@@ -126,8 +84,8 @@ router.post('/projects', async (req, res) => {
     const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     try {
       await db.query(
-        'INSERT INTO status_pages (user_id, title, slug, description) VALUES ($1, $2, $3, $4) ON CONFLICT (slug) DO NOTHING',
-        [req.session.userId, name.trim() + ' Status', slug, 'Current status of ' + name.trim()]
+        'INSERT INTO status_pages (user_id, website_id, title, slug, description) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (slug) DO NOTHING',
+        [req.session.userId, projectId, name.trim() + ' Status', slug, 'Current status of ' + name.trim()]
       );
     } catch (e) { /* slug conflict, skip */ }
 
